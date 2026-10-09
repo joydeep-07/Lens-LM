@@ -18,10 +18,16 @@
   --accent-primary: #b2d959;
 
   --border-light: #292929;
+
+  /* Google Brand Colors */
+  --google-blue: #387ded;
+  --google-red: #f28b82;
+  --google-yellow: #fdd663;
+  --google-green: #81c995;
 }
 
 /* =========================
-    LIGHT THEME
+   LIGHT THEME
 ========================= */
 [data-theme="light"] {
   color-scheme: light;
@@ -38,6 +44,12 @@
 
   /* Adjusted to a darker gray for clear visibility on white backgrounds */
   --border-light: #d1d5db; 
+
+  /* Google Brand Colors (adjusted slightly darker for better contrast on light backgrounds) */
+  --google-blue: #1a73e8;
+  --google-red: #ea4335;
+  --google-yellow: #fbbc05;
+  --google-green: #34a853;
 }
 
 /* =========================

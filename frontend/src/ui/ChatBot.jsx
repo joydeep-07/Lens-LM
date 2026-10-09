@@ -2,11 +2,13 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   CircleFadingPlus,
   Mic,
-  Paperclip,
+  Plus,
   ArrowUp,
   Copy,
   RotateCw,
   Volume2,
+  ChevronDown,
+  Sparkles,
 } from "lucide-react";
 
 import Source from "./Source";
@@ -17,6 +19,15 @@ const ChatBot = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Model & Level state selectors
+  const [selectedModel, setSelectedModel] = useState("Nova Mini");
+  const [selectedLevel, setSelectedLevel] = useState("High");
+  const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+  const [isLevelDropdownOpen, setIsLevelDropdownOpen] = useState(false);
+
+  const models = ["Nova Mini", "Nova Pro", "Lens Ultra"];
+  const levels = ["High", "Medium", "Low"];
 
   // Initialize state from sessionStorage if available, default to 60
   const [leftWidth, setLeftWidth] = useState(() => {
@@ -47,7 +58,6 @@ const ChatBot = () => {
       document.body.style.cursor = "default";
       document.body.style.userSelect = "auto";
 
-      // Save the current width to session storage when dragging ends
       setLeftWidth((currentWidth) => {
         sessionStorage.setItem("chatLeftWidth", currentWidth);
         return currentWidth;
@@ -69,12 +79,10 @@ const ChatBot = () => {
 
     const userMessage = { sender: "user", text: message };
 
-    // Add user message, clear input, and set loading state
     setMessages((prev) => [...prev, userMessage]);
     setMessage("");
     setIsLoading(true);
 
-    // Simulate backend response after a short delay
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
@@ -167,12 +175,12 @@ const ChatBot = () => {
                     </div>
                   ))}
 
-                  {/* Skeleton Loader while waiting for reply */}
+                  {/* Skeleton Loader */}
                   {isLoading && (
                     <div className="flex flex-col items-start">
                       <div className="max-w-[80%] px-4 py-2.5 text-sm w-full space-y-2">
-                        <div className="h-3 w-56 animate-pulse rounded-full bg-[var(--border-light)]" />
-                        <div className="h-3 w-34 animate-pulse rounded-full bg-[var(--bg-secondary)]" />
+                        <div className="h-2.5 w-32 animate-pulse rounded-full bg-[var(--border-light)]" />
+                        <div className="h-2 w-24 animate-pulse rounded-full bg-[var(--bg-secondary)]" />
                       </div>
                     </div>
                   )}
@@ -181,8 +189,8 @@ const ChatBot = () => {
             </div>
 
             {/* Message Input Container */}
-            <div className="bg-[var(--bg-main)]">
-              <div className="flex w-full flex-col justify-between rounded-xl min-h-[128px] border border-[var(--border-light)] p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/60 focus-within:ring-[var(--accent-primary)]/10">
+            <div className="bg-[var(--bg-main)] px-2 pb-2">
+              <div className="relative flex w-full flex-col justify-between rounded-2xl border border-[var(--border-light)]/50 bg-[var(--bg-card)]/10 p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/30">
                 {/* Textarea */}
                 <textarea
                   rows={2}
@@ -194,48 +202,121 @@ const ChatBot = () => {
                       handleSend();
                     }
                   }}
-                  placeholder="Ask anything..."
-                  className="w-full resize-none bg-transparent px-2 py-1 text-sm text-[var(--text-main)] outline-none placeholder:text-[var(--text-muted)]"
+                  placeholder="Ask anything"
+                  className="w-full resize-none bg-transparent px-1 py-1 text-sm text-[var(--text-main)] outline-none placeholder:text-[var(--text-muted)]"
                 />
 
-                {/* Bottom Action Bar */}
+                {/* Bottom Bar: Model Selector, Level Selector, Mic, Send */}
                 <div className="flex items-center justify-between pt-2">
-                  {/* Left Action Buttons */}
-                  <div className="flex items-center gap-0.5">
+                  <div className="flex items-center gap-3">
+                    {/* Add / Attachment Button */}
                     <button
                       type="button"
-                      title="Attach files"
-                      aria-label="Attach files"
-                      className="rounded-lg p-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                      title="Add content"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
                     >
-                      <Paperclip size={18} strokeWidth={1.8} />
+                      <Plus size={16} strokeWidth={2} />
                     </button>
 
+                    {/* Model Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsModelDropdownOpen(!isModelDropdownOpen);
+                          setIsLevelDropdownOpen(false);
+                        }}
+                        className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-main)] hover:opacity-80"
+                      >
+                        <span>{selectedModel}</span>
+                        <ChevronDown
+                          size={14}
+                          className="text-[var(--text-muted)]"
+                        />
+                      </button>
+
+                      {isModelDropdownOpen && (
+                        <div className="absolute bottom-full left-0 mb-2 w-36 rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] p-1 shadow-lg z-20">
+                          {models.map((mod) => (
+                            <button
+                              key={mod}
+                              onClick={() => {
+                                setSelectedModel(mod);
+                                setIsModelDropdownOpen(false);
+                              }}
+                              className={`w-full rounded-lg px-3 py-1.5 text-left text-xs transition-colors ${
+                                selectedModel === mod
+                                  ? "bg-[var(--bg-secondary)] text-[var(--text-main)] font-semibold"
+                                  : "text-[var(--text-muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                              }`}
+                            >
+                              {mod}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Level Selector (High / Medium / Low) */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsLevelDropdownOpen(!isLevelDropdownOpen);
+                          setIsModelDropdownOpen(false);
+                        }}
+                        className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-main)] hover:opacity-80"
+                      >
+                        <Sparkles
+                          size={13}
+                          className="text-[var(--accent-primary)]"
+                        />
+                        <span>{selectedLevel}</span>
+                      </button>
+
+                      {isLevelDropdownOpen && (
+                        <div className="absolute bottom-full left-0 mb-2 w-32 rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] p-1 shadow-lg z-20">
+                          {levels.map((lvl) => (
+                            <button
+                              key={lvl}
+                              onClick={() => {
+                                setSelectedLevel(lvl);
+                                setIsLevelDropdownOpen(false);
+                              }}
+                              className={`w-full rounded-lg px-3 py-1.5 text-left text-xs transition-colors ${
+                                selectedLevel === lvl
+                                  ? "bg-[var(--bg-secondary)] text-[var(--text-main)] font-semibold"
+                                  : "text-[var(--text-muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                              }`}
+                            >
+                              {lvl}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right Icons: Mic & Send */}
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       title="Voice input"
-                      aria-label="Voice input"
-                      className="rounded-lg p-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-secondary)] transition-colors hover:text-[var(--text-main)]"
                     >
-                      <Mic size={18} strokeWidth={1.8} />
+                      <Mic size={16} strokeWidth={1.8} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSend}
+                      disabled={!message.trim() || isLoading}
+                      title="Send message"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--bg-secondary)] text-[var(--text-main)] border border-[var(--border-light)] shadow-sm transition-all hover:bg-[var(--accent-primary)] hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ArrowUp size={16} strokeWidth={2.2} />
                     </button>
                   </div>
-
-                  {/* Send Button */}
-                  <button
-                    type="button"
-                    onClick={handleSend}
-                    disabled={!message.trim() || isLoading}
-                    title="Send message"
-                    aria-label="Send message"
-                    className="flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-main)] rotate-45 shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none bg-[var(--accent-primary)]"
-                  >
-                    <ArrowUp
-                      size={18}
-                      strokeWidth={2.4}
-                      className="-rotate-45"
-                    />
-                  </button>
                 </div>
               </div>
             </div>
@@ -243,7 +324,7 @@ const ChatBot = () => {
         </div>
       </div>
 
-      {/* Draggable Divider / Border */}
+      {/* Draggable Divider */}
       <div
         onMouseDown={handleMouseDown}
         className="w-1.5 cursor-col-resize transition-colors bg-transparent flex items-center justify-center shrink-0"

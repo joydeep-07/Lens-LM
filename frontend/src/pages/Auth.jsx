@@ -1,9 +1,286 @@
-import React from 'react'
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Mail,
+  ArrowUpRight,
+  KeyRound,
+  ShieldCheck,
+  Sparkles,
+  Lock,
+} from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook, FaApple } from "react-icons/fa";
+import Logo from "../components/Logo";
+import { FaMeta } from "react-icons/fa6";
 
-const Auth = () => {
+const Auth = ({ className = "" }) => {
+  const [step, setStep] = useState(1);
+
   return (
-    <div>Auth</div>
-  )
-}
+    <div
+      className={`flex justify-center items-center min-h-screen px-4 py-8 ${className}`}
+    >
+      <div className="relative w-full max-w-6xl overflow-hidden rounded-2xl border border-[var(--border-light)] border-t-[3px] border-t-[var(--google-blue)] bg-[var(--bg-main)] shadow-2xl backdrop-blur-xl">
+        <div className="grid md:grid-cols-[0.8fr_1.2fr]">
+          {/* LEFT COLUMN: BRANDING & META */}
+          <div className="relative flex md:min-h-[500px] flex-col justify-between border-b border-[var(--border-light)] bg-[var(--bg-secondary)] p-7 sm:p-9 md:border-b-0 md:border-r">
+            <div>
+              <div className="mb-8 flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--bg-card)] text-[var(--google-blue)] shadow-sm">
+                  <ShieldCheck size={14} />
+                </span>
+                <span className="text-[9px] font-medium uppercase tracking-[0.25em] text-[var(--text-secondary)]">
+                  Secure Gateway
+                </span>
+              </div>
 
-export default Auth
+              <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-[var(--google-blue)] font-semibold">
+                01 / Account Access
+              </p>
+
+              <h2 className="text-[var(--text-main)] font-heading text-3xl md:text-4xl mb-4 tracking-tight">
+                Lens LM.
+              </h2>
+
+              <p className="text-xs leading-relaxed text-[var(--text-secondary)] max-w-xs">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Consequatur, consequuntur.
+              </p>
+            </div>{" "}
+            <div className=" flex justify-center">
+              <Logo />
+            </div>
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[var(--border-light)]">
+                <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)]">
+                  <Sparkles size={12} className="text-[var(--google-yellow)]" />
+                  <span>Fast & Secure</span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)]">
+                  <Lock size={12} className="text-[var(--google-green)]" />
+                  <span>End-to-End Encrypted</span>
+                </div>
+              </div>
+            </div>
+            {/* DECORATIVE WATERMARK NUMBER */}
+            <span className="pointer-events-none absolute bottom-4 right-6 select-none opacity-5 text-[100px] font-bold leading-none text-[var(--text-main)]/[0.03]">
+              01
+            </span>
+          </div>
+
+          {/* RIGHT COLUMN: INTERACTIVE FORM UI */}
+          <div className="p-7 sm:p-9 md:p-10 bg-[var(--bg-card)] flex flex-col justify-between">
+            <div>
+              <div className="mb-6">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-[var(--text-secondary)]">
+                    {step === 1 ? "Sign In / Register" : "Security Check"}
+                  </p>
+                  <ArrowUpRight
+                    size={14}
+                    className="text-[var(--text-muted)]"
+                  />
+                </div>
+                <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
+                  {step === 1
+                    ? "Enter your email address to log in or create your account instantly using a secure OTP."
+                    : "Enter the 6-digit verification code sent to your registered email inbox."}
+                </p>
+              </div>
+
+              <AnimatePresence mode="wait">
+                {step === 1 ? (
+                  /* STEP 1: EMAIL & SOCIAL LOGINS */
+                  <motion.div
+                    key="step-1"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.25 }}
+                    className="space-y-5"
+                  >
+                    <div>
+                      <label
+                        htmlFor="user-email"
+                        className="mb-2 block text-[9px] font-medium uppercase tracking-[0.2em] text-[var(--text-secondary)]"
+                      >
+                        Email Address
+                      </label>
+                      <div className="group relative">
+                        <Mail
+                          size={14}
+                          className="absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors duration-300 group-focus-within:text-[var(--google-blue)]"
+                        />
+                        <input
+                          id="user-email"
+                          type="email"
+                          placeholder="name@example.com"
+                          className="w-full border-b border-[var(--border-light)] bg-transparent py-3 pl-7 pr-2 text-sm text-[var(--text-main)] outline-none placeholder:text-[var(--text-muted)] transition-all duration-300 focus:border-[var(--google-blue)]"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setStep(2)}
+                      className="group relative mt-1 flex w-full items-center justify-between overflow-hidden rounded-sm bg-gradient-to-r from-[var(--google-blue)] to-[#1a73e8] px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-[var(--google-blue)]/20 transition-all duration-300 hover:shadow-lg hover:shadow-[var(--google-blue)]/30 hover:brightness-105 active:scale-[0.99]"
+                    >
+                      <span className="relative z-10">Continue with OTP</span>
+                      <ArrowUpRight
+                        size={15}
+                        className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                      <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    </button>
+                  </motion.div>
+                ) : (
+                  /* STEP 2: OTP UI */
+                  <motion.div
+                    key="step-2"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.25 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label
+                          htmlFor="user-otp"
+                          className="block text-[9px] font-medium uppercase tracking-[0.2em] text-[var(--text-secondary)]"
+                        >
+                          Verification Code
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setStep(1)}
+                          className="text-[9px] uppercase tracking-[0.15em] text-[var(--google-blue)] hover:underline font-medium"
+                        >
+                          Change Email
+                        </button>
+                      </div>
+
+                      <div className="group relative">
+                        <KeyRound
+                          size={14}
+                          className="absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors duration-300 group-focus-within:text-[var(--google-blue)]"
+                        />
+                        <input
+                          id="user-otp"
+                          type="text"
+                          maxLength={6}
+                          placeholder="••••••"
+                          className="w-full border-b border-[var(--border-light)] bg-transparent py-3 pl-7 pr-2 text-sm tracking-widest font-mono text-[var(--text-main)] outline-none placeholder:text-[var(--text-muted)] placeholder:font-sans placeholder:tracking-normal transition-all duration-300 focus:border-[var(--google-blue)]"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => alert("Successfully Logged In!")}
+                      className="group relative mt-2 flex w-full items-center justify-between overflow-hidden rounded-sm bg-gradient-to-r from-[var(--google-blue)] to-[#1a73e8] px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-[var(--google-blue)]/20 transition-all duration-300 hover:shadow-lg hover:shadow-[var(--google-blue)]/30 hover:brightness-105 active:scale-[0.99]"
+                    >
+                      <span className="relative z-10">Verify OTP</span>
+                      <ArrowUpRight
+                        size={15}
+                        className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                      <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* WRAPPER FOR SOCIAL LOGINS & BOTTOM FOOTER TO PIN ABOVE BORDER */}
+            <div className="space-y-4 pt-6">
+              {/* SOCIAL LOGIN BUTTONS */}
+
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-[var(--border-light)]"></div>
+                <span className="flex-shrink mx-4 text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)]">
+                  Or continue with
+                </span>
+                <div className="flex-grow border-t border-[var(--border-light)]"></div>
+              </div>
+              <div className="grid grid-cols-4 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => alert("Google Login")}
+                  className="group flex items-center justify-center gap-2 rounded-smborder border-[var(--border-light)] bg-[var(--bg-secondary)] py-2.5 px-2 shadow-xs transition-all duration-300 hover:border-[var(--google-blue)] hover:bg-[var(--bg-main)] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  title="Google"
+                >
+                  <FcGoogle
+                    size={16}
+                    className="shrink-0 transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <span className="text-[10px] font-medium text-[var(--text-main)] truncate">
+                    Google
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => alert("Apple Login")}
+                  className="group flex items-center justify-center gap-2 rounded-smborder border-[var(--border-light)] bg-[var(--bg-secondary)] py-2.5 px-2 shadow-xs transition-all duration-300 hover:border-[var(--text-main)] hover:bg-[var(--bg-main)] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  title="Apple"
+                >
+                  <FaApple
+                    size={16}
+                    className="shrink-0 text-[var(--text-main)] transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <span className="text-[10px] font-medium text-[var(--text-main)] truncate">
+                    Apple
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => alert("Facebook Login")}
+                  className="group flex items-center justify-center gap-2 rounded-smborder border-[var(--border-light)] bg-[var(--bg-secondary)] py-2.5 px-2 shadow-xs transition-all duration-300 hover:border-[#1877F2]/50 hover:bg-[var(--bg-main)] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  title="Facebook"
+                >
+                  <FaFacebook
+                    size={16}
+                    className="shrink-0 text-[#1877F2] transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <span className="text-[10px] font-medium text-[var(--text-main)] truncate">
+                    Facebook
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => alert("Meta Login")}
+                  className="group flex items-center justify-center gap-2 rounded-smborder border-[var(--border-light)] bg-[var(--bg-secondary)] py-2.5 px-2 shadow-xs transition-all duration-300 hover:border-[var(--google-blue)]/50 hover:bg-[var(--bg-main)] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  title="Meta"
+                >
+                  <FaMeta
+                    size={16}
+                    className="shrink-0 text-[#0081FB] transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <span className="text-[10px] font-medium text-[var(--text-main)] truncate">
+                    Meta
+                  </span>
+                </button>
+              </div>
+
+              {/* BOTTOM META FOOTER */}
+              <div className="flex items-center justify-between border-t border-[var(--border-light)] pt-4">
+                <span className="text-[9px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                  Secure Authentication
+                </span>
+                <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--google-green)] animate-pulse" />
+                  Connected
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Auth;
