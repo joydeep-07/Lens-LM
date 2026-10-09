@@ -1,13 +1,8 @@
-
 import React, { useState } from "react";
-import {
-  CircleFadingPlus,
-  Mic,
-  Paperclip,
-  ArrowUp,
-} from "lucide-react";
+import { CircleFadingPlus, Mic, Paperclip, ArrowUp } from "lucide-react";
 
 import Source from "./Source";
+import EmptyChat from "./EmptyChat";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -26,8 +21,10 @@ const ChatBot = () => {
       <div className="flex w-6/10 flex-col justify-between gap-3 p-3">
         {/* Navbar */}
         <nav className="flex items-center justify-between rounded-xl border border-[var(--border-light)] px-4 py-3">
-          <h1 className="text-lg font-semibold tracking-tight">Lens LM</h1>
-
+          <div className="flex gap-4 items-center">
+            <img src="./logo.png" className="h-8" alt="" />
+            <h1 className="text-lg font-semibold tracking-tight">Lens LM</h1>
+          </div>
           <button
             type="button"
             title="New chat"
@@ -39,21 +36,10 @@ const ChatBot = () => {
         </nav>
 
         {/* Chat Messages */}
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-6">
-          <div className="m-auto max-w-sm text-center">
-            <h2 className="mb-2 text-lg font-medium">
-              Start a conversation
-            </h2>
-
-            <p className="text-sm leading-6 text-[var(--text-muted)]">
-              Ask questions, explore your documents, and get answers based on
-              your sources.
-            </p>
-          </div>
-        </div>
+        <EmptyChat />
 
         {/* Message Input */}
-        <div className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3 transition-colors focus-within:border-[var(--accent-primary)]">
+        <div className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3 h-32 transition-colors focus-within:border-[var(--accent-primary)]">
           <textarea
             rows={2}
             value={message}
@@ -110,4 +96,3 @@ const ChatBot = () => {
 };
 
 export default ChatBot;
-

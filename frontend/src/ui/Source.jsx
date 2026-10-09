@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { FileText, Plus, File, X, Upload } from "lucide-react";
+import EmptySource from "./EmptySource";
 
 const Source = () => {
   const fileInputRef = useRef(null);
@@ -127,16 +128,15 @@ const Source = () => {
 
           {/* Empty State */}
           {files.length === 0 && (
-            <div className="px-4 py-3 text-center">
-              <p className="text-xs leading-5 text-[var(--text-muted)]">
-                Your added documents will appear here. Upload sources to start
-                asking questions about their content.
-              </p>
-            </div>
+            <>
+              <div className="flex-1">
+                <EmptySource />
+              </div>
+            </>
           )}
         </div>
-
         {/* Bottom Section: Redesigned Drag and Drop Area */}
+
         <div
           onDragOver={(event) => {
             event.preventDefault();
@@ -149,24 +149,36 @@ const Source = () => {
           }}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`mt-auto flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed  border-[var(--border-light)] bg-[var(--bg-card)] px-4 py-4 text-center transition-all focus-within:border-[var(--accent-primary)] hover:border-[var(--accent-primary)] shadow-sm h-32 ${
+          className={`group mt-auto flex h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-4 text-center transition-all duration-200 ${
             isDragging
-              ? "border-[var(--accent-primary)] bg-[var(--bg-secondary)]"
-              : ""
+              ? "border-[var(--accent-primary)] bg-[var(--bg-secondary)] scale-[0.99]"
+              : "border-[var(--border-light)] bg-[var(--bg-card)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-secondary)]/50"
           }`}
         >
-          <div className="flex items-center gap-2 mb-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--bg-secondary)] text-[var(--text-secondary)]">
-              <Upload size={16} strokeWidth={1.8} />
-            </div>
-            <h3 className="text-sm font-medium">
-              {isDragging ? "Drop your files here" : "Add your sources"}
-            </h3>
-          </div>
+          {/* Heading */}
+          <h3 className="text-sm font-medium tracking-tight">
+            {isDragging ? "Drop to upload" : "Add your sources"}
+          </h3>
 
-          <p className="mt-1 text-[11px] text-[var(--text-muted)]">
-            PDF, TXT, DOC, DOCX, MD, CSV
+          {/* Description */}
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
+            Drag files here or{" "}
+            <span className="font-medium text-[var(--accent-primary)]">
+              browse
+            </span>
           </p>
+
+          {/* Supported File Types */}
+          <div className="mt-3 flex items-center gap-1.5">
+            {["PDF", "TXT", "DOCX", "MD", "JPG", "PNG"].map((type) => (
+              <span
+                key={type}
+                className=" px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-[var(--text-muted)]"
+              >
+                {type}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>
