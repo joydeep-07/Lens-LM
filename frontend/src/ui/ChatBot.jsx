@@ -14,6 +14,7 @@ import {
 import Source from "./Source";
 import EmptyChat from "./EmptyChat";
 import SidePanel from "./SidePanel";
+import BlurCircle from "../components/BlurCircle";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -86,18 +87,21 @@ const ChatBot = () => {
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: "We're unable to connect to the backend server at the moment. This may be due to a temporary server issue or an unstable connection. Please try again in a few moments. Once the connection is restored, you'll be able to continue using the service as usual." },
+        {
+          sender: "bot",
+          text: "We're unable to connect to the backend server at the moment. This may be due to a temporary server issue or an unstable connection. Please try again in a few moments. Once the connection is restored, you'll be able to continue using the service as usual.",
+        },
       ]);
       setIsLoading(false);
     }, 1000);
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-main)] text-[var(--text-main)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--main)] text-[var(--text-main)]">
       {/* Left Panel */}
       <div
         style={{ width: `${leftWidth}%` }}
-        className="flex flex-col justify-between rounded-xl border-r border-[var(--border-light)]/50 gap-2 p-2 shrink-0"
+        className="flex flex-col justify-between bg-[var(--bg-main)]  rounded-xl border-r border-[var(--border-light)]/50 gap-2 p-2 shrink-0"
       >
         {/* Navbar */}
         <nav className="flex items-center justify-between rounded-xl px-3 py-2">
@@ -122,9 +126,17 @@ const ChatBot = () => {
           <SidePanel />
 
           {/* Main Chat Area */}
-          <div className="flex flex-1 flex-col h-full overflow-hidden">
+          <div className="relative flex flex-1 flex-col h-full overflow-hidden">
+            {/* Google Color Glow — Consistent Background Positions */}
+            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+              <BlurCircle top="10%" left="15%" color="blue" />
+              <BlurCircle top="30%" right="10%" color="red" />
+              <BlurCircle bottom="10%" left="25%" color="yellow" />
+              <BlurCircle bottom="15%" right="20%" color="green" />
+            </div>
+
             {/* Chat Messages / Empty State Area */}
-            <div className="flex-1 overflow-y-auto pb-2 px-2">
+            <div className="flex-1 overflow-y-auto pb-2 px-2 z-10">
               {messages.length === 0 ? (
                 <EmptyChat />
               ) : (
@@ -189,7 +201,7 @@ const ChatBot = () => {
             </div>
 
             {/* Message Input Container */}
-            <div className="bg-[var(--bg-main)] px-2 pb-2">
+            <div className="bg-[var(--bg-main)] rounded-2xl z-10">
               <div className="relative flex w-full flex-col justify-between rounded-2xl border border-[var(--border-light)]/50 bg-[var(--bg-card)]/10 p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/30">
                 {/* Textarea */}
                 <textarea

@@ -6,7 +6,7 @@
 :root,
 [data-theme="dark"] {
   color-scheme: dark;
-
+  --main: black;
   --bg-main: #0a0a0a;
   --bg-secondary: #121212;
   --bg-card: #1a1a1a;
@@ -31,7 +31,7 @@
 ========================= */
 [data-theme="light"] {
   color-scheme: light;
-
+  --main: white;
   --bg-main: #f8f9fa;
   --bg-secondary: #f0f1f3;
   --bg-card: #ffffff;
@@ -43,7 +43,7 @@
   --accent-primary: #5d8c14;
 
   /* Adjusted to a darker gray for clear visibility on white backgrounds */
-  --border-light: #d1d5db; 
+  --border-light: #d1d5db;
 
   /* Google Brand Colors (adjusted slightly darker for better contrast on light backgrounds) */
   --google-blue: #1a73e8;
