@@ -21,7 +21,7 @@
 }
 
 /* =========================
-   LIGHT THEME
+    LIGHT THEME
 ========================= */
 [data-theme="light"] {
   color-scheme: light;
@@ -36,7 +36,8 @@
 
   --accent-primary: #5d8c14;
 
-  --border-light: #e5e5e5;
+  /* Adjusted to a darker gray for clear visibility on white backgrounds */
+  --border-light: #d1d5db; 
 }
 
 /* =========================

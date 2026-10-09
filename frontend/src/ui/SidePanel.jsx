@@ -13,7 +13,7 @@ import ThemeToggle from "../components/ThemeToggle";
 
 const SidePanel = () => {
   return (
-    <div className="w-12 h-full border-r border-[var(--border-light)] flex flex-col justify-between items-center py-4">
+    <div className="w-12 h-full flex flex-col justify-between items-center py-4">
       {/* Top Section: New Chat & Main Navigation */}
       <div className="flex flex-col items-center gap-4 w-full px-2">
         {/* New Chat Button */}
