@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { CircleFadingPlus, Mic, Paperclip, ArrowUp } from "lucide-react";
+import {
+  CircleFadingPlus,
+  Mic,
+  Paperclip,
+  ArrowUp,
+  Copy,
+  RotateCw,
+  Volume2,
+} from "lucide-react";
 
 import Source from "./Source";
 import EmptyChat from "./EmptyChat";
@@ -7,13 +15,15 @@ import SidePanel from "./SidePanel";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
-  
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   // Initialize state from sessionStorage if available, default to 60
   const [leftWidth, setLeftWidth] = useState(() => {
     const savedWidth = sessionStorage.getItem("chatLeftWidth");
     return savedWidth ? parseFloat(savedWidth) : 60;
   });
-  
+
   const isDragging = useRef(false);
 
   const handleMouseDown = () => {
@@ -26,9 +36,6 @@ const ChatBot = () => {
     if (!isDragging.current) return;
     const newWidth = (e.clientX / window.innerWidth) * 100;
 
-    // Left panel bounds:
-    // Minimum 60% -> Caps the right Source panel at a maximum of 40vw
-    // Maximum 80% -> Allows the right Source panel to contract below 40vw
     if (newWidth >= 60 && newWidth <= 80) {
       setLeftWidth(newWidth);
     }
@@ -58,9 +65,23 @@ const ChatBot = () => {
   }, [handleMouseMove, handleMouseUp]);
 
   const handleSend = () => {
-    if (!message.trim()) return;
-    console.log("Message:", message);
+    if (!message.trim() || isLoading) return;
+
+    const userMessage = { sender: "user", text: message };
+
+    // Add user message, clear input, and set loading state
+    setMessages((prev) => [...prev, userMessage]);
     setMessage("");
+    setIsLoading(true);
+
+    // Simulate backend response after a short delay
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "We're unable to connect to the backend server at the moment. This may be due to a temporary server issue or an unstable connection. Please try again in a few moments. Once the connection is restored, you'll be able to continue using the service as usual." },
+      ]);
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
@@ -95,8 +116,68 @@ const ChatBot = () => {
           {/* Main Chat Area */}
           <div className="flex flex-1 flex-col h-full overflow-hidden">
             {/* Chat Messages / Empty State Area */}
-            <div className="flex-1 overflow-y-auto pb-2">
-              <EmptyChat />
+            <div className="flex-1 overflow-y-auto pb-2 px-2">
+              {messages.length === 0 ? (
+                <EmptyChat />
+              ) : (
+                <div className="flex flex-col gap-4 py-2">
+                  {messages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className={`flex flex-col ${
+                        msg.sender === "user" ? "items-end" : "items-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[80%] px-4 py-2.5 text-sm ${
+                          msg.sender === "user"
+                            ? "bg-[var(--bg-secondary)] rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)] border border-[var(--border-light)]"
+                            : "text-[var(--text-main)] w-full"
+                        }`}
+                      >
+                        {msg.text}
+
+                        {/* Action Icons Below Bot Reply */}
+                        {msg.sender === "bot" && (
+                          <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
+                            <button
+                              onClick={() =>
+                                navigator.clipboard.writeText(msg.text)
+                              }
+                              className="transition-colors hover:text-[var(--text-main)]"
+                              title="Copy"
+                            >
+                              <Copy size={15} strokeWidth={1.8} />
+                            </button>
+                            <button
+                              className="transition-colors hover:text-[var(--text-main)]"
+                              title="Regenerate"
+                            >
+                              <RotateCw size={15} strokeWidth={1.8} />
+                            </button>
+                            <button
+                              className="transition-colors hover:text-[var(--text-main)]"
+                              title="Listen"
+                            >
+                              <Volume2 size={15} strokeWidth={1.8} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Skeleton Loader while waiting for reply */}
+                  {isLoading && (
+                    <div className="flex flex-col items-start">
+                      <div className="max-w-[80%] px-4 py-2.5 text-sm w-full space-y-2">
+                        <div className="h-3 w-56 animate-pulse rounded-full bg-[var(--border-light)]" />
+                        <div className="h-3 w-34 animate-pulse rounded-full bg-[var(--bg-secondary)]" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Message Input Container */}
@@ -144,12 +225,16 @@ const ChatBot = () => {
                   <button
                     type="button"
                     onClick={handleSend}
-                    disabled={!message.trim()}
+                    disabled={!message.trim() || isLoading}
                     title="Send message"
                     aria-label="Send message"
-                    className="flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-main)] rotate-45 shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-main)] rotate-45 shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none bg-[var(--accent-primary)]"
                   >
-                    <ArrowUp size={18} strokeWidth={2.4} />
+                    <ArrowUp
+                      size={18}
+                      strokeWidth={2.4}
+                      className="-rotate-45"
+                    />
                   </button>
                 </div>
               </div>
