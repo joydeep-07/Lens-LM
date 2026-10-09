@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
-:root {
+/* =========================
+   DARK THEME (DEFAULT)
+========================= */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
   --bg-main: #0a0a0a;
   --bg-secondary: #121212;
   --bg-card: #1a1a1a;
@@ -14,15 +20,55 @@
   --border-light: #292929;
 }
 
-*{
-  /* background-color: var(--bg-main); */
-  color: var(--text-main)
+/* =========================
+   LIGHT THEME
+========================= */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-main: #f8f9fa;
+  --bg-secondary: #f0f1f3;
+  --bg-card: #ffffff;
+
+  --text-main: #171717;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+
+  --accent-primary: #5d8c14;
+
+  --border-light: #e5e5e5;
 }
 
-button{
+/* =========================
+   GLOBAL STYLES
+========================= */
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-main);
+}
+
+* {
+  box-sizing: border-box;
+  color: var(--text-main);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+button {
   cursor: pointer;
 }
 
+/* =========================
+   FONT
+========================= */
 @font-face {
   font-family: "Genos";
   src: url("./assets/fonts/genos.ttf") format("truetype");
@@ -31,5 +77,4 @@ button{
 
 .font-heading {
   font-family: "Genos", sans-serif;
-  font: italic;
 }
