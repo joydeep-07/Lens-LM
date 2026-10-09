@@ -8,6 +8,7 @@ import {
   Settings,
   Sun,
   CircleFadingPlus,
+  Coffee,
 } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
 
@@ -53,7 +54,7 @@ const SidePanel = () => {
 
       {/* Bottom Section: Theme, Settings, Profile */}
       <div className="flex flex-col items-center gap-2 w-full px-2">
-        <ThemeToggle/>
+        <ThemeToggle />
         <button
           title="Settings"
           className="p-2.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors"
@@ -66,6 +67,8 @@ const SidePanel = () => {
         >
           <User size={16} />
         </button>
+
+       
       </div>
     </div>
   );

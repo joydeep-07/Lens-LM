@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { FileText, Plus, File, X, Upload } from "lucide-react";
+import { FileText, Plus, File, X, Upload, Coffee } from "lucide-react";
 import EmptySource from "./EmptySource";
 
 const Source = () => {
@@ -26,16 +26,15 @@ const Source = () => {
   };
 
   return (
-    <div className="hidden w-4/10 flex-col gap-3 rounded-xl  border-l border-[var(--border-light)]/50 p-3 md:flex h-full">
+    <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-3 h-full overflow-hidden bg-[var(--bg-main)]">
       {/* Sources Navbar */}
-      <nav className="flex items-center justify-between rounded-xl px-4 py-3">
+      <nav className="flex items-center justify-between rounded-xl px-4 py-3 shrink-0">
         <div className="flex items-center gap-2">
           <FileText
             size={18}
             strokeWidth={1.8}
             className="text-[var(--text-secondary)]"
           />
-
           <h2 className="text-xl font-light font-heading">Sources</h2>
 
           {files.length > 0 && (
@@ -46,13 +45,10 @@ const Source = () => {
         </div>
 
         <button
-          type="button"
-          title="Add sources"
-          aria-label="Add sources"
-          onClick={() => fileInputRef.current?.click()}
-          className="rounded-lg p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+          title="Profile"
+          className="p-2.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors"
         >
-          <Plus size={19} strokeWidth={1.8} />
+          <Coffee size={16} />
         </button>
       </nav>
 
@@ -61,7 +57,7 @@ const Source = () => {
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".pdf,.txt,.doc,.docx,.md,.csv"
+        accept=".pdf,.txt,.doc,.docx,.md,.csv,.jpg,.png"
         className="hidden"
         onChange={(event) => {
           handleFiles(event.target.files);
@@ -69,16 +65,18 @@ const Source = () => {
         }}
       />
 
-      {/* Sources Content */}
-      <div className="flex flex-1 flex-col justify-between gap-4 overflow-y-auto">
-        {/* Top Section: Selected Files & Empty State */}
-        <div className="flex flex-col gap-4">
-          {/* Selected Files */}
-          {files.length > 0 && (
+      {/* Sources Content Area */}
+      <div className="flex flex-1 flex-col justify-between gap-4 overflow-hidden">
+        {/* Top Section: Empty State or Added Files */}
+        <div className="flex-1 overflow-y-auto pr-1 space-y-3">
+          {files.length === 0 ? (
+            <EmptySource />
+          ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Added files</h3>
-
+              <div className="flex items-center justify-between px-1">
+                <h3 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Added files
+                </h3>
                 <button
                   type="button"
                   onClick={() => setFiles([])}
@@ -91,7 +89,7 @@ const Source = () => {
               {files.map((file, index) => (
                 <div
                   key={`${file.name}-${file.size}-${index}`}
-                  className="flex items-center gap-3 rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3"
+                  className="flex items-center gap-3 rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3 transition-all hover:border-[var(--border-light)]/80"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-secondary)]">
                     <File
@@ -103,8 +101,7 @@ const Source = () => {
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{file.name}</p>
-
-                    <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                       {(file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
@@ -125,18 +122,9 @@ const Source = () => {
               ))}
             </div>
           )}
-
-          {/* Empty State */}
-          {files.length === 0 && (
-            <>
-              <div className="flex-1">
-                <EmptySource />
-              </div>
-            </>
-          )}
         </div>
-        {/* Bottom Section: Redesigned Drag and Drop Area */}
 
+        {/* Bottom Section: Drag and Drop Area */}
         <div
           onDragOver={(event) => {
             event.preventDefault();
@@ -149,23 +137,26 @@ const Source = () => {
           }}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`group mt-auto flex h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-4 text-center transition-all duration-200 ${
+          className={`group shrink-0 mt-auto flex h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-4 text-center transition-all duration-200 ${
             isDragging
               ? "border-[var(--accent-primary)] bg-[var(--bg-secondary)] scale-[0.99]"
               : "border-[var(--border-light)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-secondary)]/50"
           }`}
         >
-          {/* Heading */}
-          <h3 className="text-sm font-light tracking-tight">
+          <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)] transition-colors">
+            <Upload size={16} strokeWidth={1.8} />
+          </div>
+
+          <h3 className="text-sm font-light tracking-tight text-[var(--text-main)]">
             {isDragging ? "Drop to upload" : "Drag files here or browse"}
           </h3>
 
           {/* Supported File Types */}
-          <div className="mt-3 flex items-center gap-1.5">
+          <div className="mt-2.5 flex flex-wrap justify-center items-center gap-1">
             {["PDF", "TXT", "DOCX", "MD", "JPG", "PNG"].map((type) => (
               <span
                 key={type}
-                className=" px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-[var(--text-muted)]"
+                className="rounded border border-[var(--border-light)] px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-[var(--text-muted)] bg-[var(--bg-secondary)]/30"
               >
                 {type}
               </span>
