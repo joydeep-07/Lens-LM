@@ -23,7 +23,7 @@ const ChatBot = () => {
         {/* Navbar */}
         <nav className="flex items-center justify-between rounded-xl border border-[var(--border-light)] px-4 py-3">
           <div className="flex gap-4 items-center">
-            <img src="./logo.png" className="h-8" alt="" />
+            <img src="./logo.svg" className="h-8" alt="" />
             <h1 className="text-2xl font-light tracking-tight font-heading">
               Lens LM.
             </h1>
