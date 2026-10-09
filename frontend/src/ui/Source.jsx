@@ -36,7 +36,7 @@ const Source = () => {
             className="text-[var(--text-secondary)]"
           />
 
-          <h2 className="text-base font-medium">Sources</h2>
+          <h2 className="text-xl font-light font-heading">Sources</h2>
 
           {files.length > 0 && (
             <span className="rounded-md bg-[var(--bg-secondary)] px-2 py-0.5 text-xs text-[var(--text-secondary)]">
@@ -152,21 +152,13 @@ const Source = () => {
           className={`group mt-auto flex h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-4 text-center transition-all duration-200 ${
             isDragging
               ? "border-[var(--accent-primary)] bg-[var(--bg-secondary)] scale-[0.99]"
-              : "border-[var(--border-light)] bg-[var(--bg-card)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-secondary)]/50"
+              : "border-[var(--border-light)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-secondary)]/50"
           }`}
         >
           {/* Heading */}
-          <h3 className="text-sm font-medium tracking-tight">
-            {isDragging ? "Drop to upload" : "Add your sources"}
+          <h3 className="text-sm font-light tracking-tight">
+            {isDragging ? "Drop to upload" : "Drag files here or browse"}
           </h3>
-
-          {/* Description */}
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Drag files here or{" "}
-            <span className="font-medium text-[var(--accent-primary)]">
-              browse
-            </span>
-          </p>
 
           {/* Supported File Types */}
           <div className="mt-3 flex items-center gap-1.5">

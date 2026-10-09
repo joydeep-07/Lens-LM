@@ -24,13 +24,15 @@ const ChatBot = () => {
         <nav className="flex items-center justify-between rounded-xl border border-[var(--border-light)] px-4 py-3">
           <div className="flex gap-4 items-center">
             <img src="./logo.png" className="h-8" alt="" />
-            <h1 className="text-lg font-semibold tracking-tight">Lens LM</h1>
+            <h1 className="text-2xl font-light tracking-tight font-heading">
+              Lens LM.
+            </h1>
           </div>
           <button
             type="button"
             title="New chat"
             aria-label="New chat"
-            className="rounded-lg p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+            className="rounded-lg p-2 text-[var(--text-secondary)] hover:text-[var(--text-main)]"
           >
             <CircleFadingPlus size={19} strokeWidth={1.8} />
           </button>
@@ -41,15 +43,15 @@ const ChatBot = () => {
           <SidePanel />
 
           {/* Main Chat Area */}
-          <div className="flex flex-1 flex-col h-full bg-[var(--bg-secondary)]">
+          <div className="flex flex-1 flex-col h-full">
             {/* Chat Messages / Empty State Area */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6">
+            <div className="flex-1 overflow-y-auto pb-3">
               <EmptyChat />
             </div>
 
             {/* Message Input Container */}
             <div className="bg-[var(--bg-main)]">
-              <div className="w-full rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/70 focus-within:ring-[var(--accent-primary)]/10">
+              <div className="w-full rounded-xl border border-[var(--border-light)] p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/60 focus-within:ring-[var(--accent-primary)]/10">
                 <textarea
                   rows={2}
                   value={message}
@@ -93,7 +95,7 @@ const ChatBot = () => {
                     disabled={!message.intent?.trim() && !message.trim()}
                     title="Send message"
                     aria-label="Send message"
-                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent-primary)] text-white shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-main)] rotate-45 shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                   >
                     <ArrowUp size={18} strokeWidth={2.4} />
                   </button>

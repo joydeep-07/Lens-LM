@@ -12,13 +12,15 @@ import {
 
 const SidePanel = () => {
   return (
-    <div className="w-12 h-full border-r border-[var(--border-light)] bg-[var(--bg-secondary)] flex flex-col justify-between items-center py-4">
+    <div className="w-12 h-full border-r border-[var(--border-light)] flex flex-col justify-between items-center py-4">
       {/* Top Section: New Chat & Main Navigation */}
       <div className="flex flex-col items-center gap-4 w-full px-2">
         {/* New Chat Button */}
         <button
-          title="New Chat"
-          className="p-2.5 rounded-lg bg-[var(--accent-primary)] text-[var(--bg-main)] font-semibold hover:opacity-90 transition-opacity flex items-center justify-center"
+          type="button"
+          title="New chat"
+          aria-label="New chat"
+          className="rounded-lg p-2 text-[var(--text-secondary)] hover:text-[var(--text-main)]"
         >
           <CircleFadingPlus size={19} strokeWidth={1.8} />
         </button>
