@@ -1,5 +1,5 @@
 import React from "react";
-
+import GradientText from "../components/GradientText";
 const EmptyChat = () => {
   const suggestions = [
     {
@@ -20,11 +20,19 @@ const EmptyChat = () => {
     <div className="flex h-full flex-col justify-between px-8 py-10">
       {/* Greeting */}
       <div>
-        <h1 className="mb-1.5 font-heading text-5xl font-light tracking-tight text-[var(--text-main)]">
-          Hi There!
-        </h1>
-        <p className="text-[17px] text-[var(--text-muted)]">
-          How can I help you today?
+        <GradientText
+          colors={["#4285F4", "#EA4335", "#FBBC04", "#34A853"]}
+          animationSpeed={8}
+          variant="linear"
+          glow={0}
+        >
+          <h1 className="mb-1.5 font-heading text-6xl font-light tracking-tight text-[var(--text-main)]">
+            Hello There!
+          </h1>
+        </GradientText>
+        <p className="max-w-sm text-sm font-light leading-relaxed tracking-wide text-[var(--text-secondary)]">
+          Upload documents, ask questions, and get intelligent answers, concise
+          summaries, and clear explanations.
         </p>
       </div>
 

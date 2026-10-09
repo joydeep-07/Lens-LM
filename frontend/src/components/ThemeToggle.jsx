@@ -10,7 +10,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={() => dispatch(toggleTheme())}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--bg-card)] text-[var(--text-main)] transition-all duration-200 hover:bg-[var(--bg-secondary)]"
+      className="flex h-9 w-9 items-center justify-center text-[var(--text-main)] transition-all duration-200"
     >
       {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
     </button>
