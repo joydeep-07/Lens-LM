@@ -8,7 +8,7 @@ import {
   HistoryIcon,
 } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
-import PopupModal from "../components/PopupModal"; // Point to your reusable component path
+import PopupModal from "../components/PopupModal";
 import ChatHistory from "./ChatHistory";
 import StarredChats from "./StarredChats";
 import Settings69 from "./Settings";

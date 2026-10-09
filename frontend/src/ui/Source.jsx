@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 import { FileText, Plus, File, X, Upload, Coffee } from "lucide-react";
 import EmptySource from "./EmptySource";
-
+import QrCode from "./QrCode";
+import PopupModal from "../components/PopupModal";
 const Source = () => {
   const fileInputRef = useRef(null);
 
@@ -44,12 +45,13 @@ const Source = () => {
           )}
         </div>
 
-        <button
-          title="Profile"
-          className="p-2.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors"
+        <PopupModal
+          icon={Coffee}
+          title="Buy me a chai"
+          ariaLabel="Buy me a chai"
         >
-          <Coffee size={16} />
-        </button>
+          <QrCode/>
+        </PopupModal>
       </nav>
 
       {/* Hidden File Input */}
