@@ -3,6 +3,7 @@ import { CircleFadingPlus, Mic, Paperclip, ArrowUp } from "lucide-react";
 
 import Source from "./Source";
 import EmptyChat from "./EmptyChat";
+import SidePanel from "./SidePanel";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -35,56 +36,70 @@ const ChatBot = () => {
           </button>
         </nav>
 
-        {/* Chat Messages */}
-        <EmptyChat />
+        <div className="flex h-full gap-2 w-full">
+          {/* Side Navigation Panel */}
+          <SidePanel />
 
-        {/* Message Input */}
-        <div className="rounded-2xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3 h-32 transition-colors focus-within:border-[var(--accent-primary)]">
-          <textarea
-            rows={2}
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                handleSend();
-              }
-            }}
-            placeholder="Ask anything..."
-            className="w-full resize-none bg-transparent px-2 py-2 text-sm outline-none placeholder:text-[var(--text-muted)]"
-          />
-
-          <div className="mt-2 flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                title="Attach files"
-                aria-label="Attach files"
-                className="rounded-lg p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
-              >
-                <Paperclip size={18} strokeWidth={1.8} />
-              </button>
-
-              <button
-                type="button"
-                title="Voice input"
-                aria-label="Voice input"
-                className="rounded-lg p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
-              >
-                <Mic size={18} strokeWidth={1.8} />
-              </button>
+          {/* Main Chat Area */}
+          <div className="flex flex-1 flex-col h-full bg-[var(--bg-secondary)]">
+            {/* Chat Messages / Empty State Area */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-6">
+              <EmptyChat />
             </div>
 
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={!message.trim()}
-              title="Send message"
-              aria-label="Send message"
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent-primary)] text-white transition-all hover:opacity-85 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <ArrowUp size={20} strokeWidth={2.2} />
-            </button>
+            {/* Message Input Container */}
+            <div className="bg-[var(--bg-main)]">
+              <div className="w-full rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/70 focus-within:ring-[var(--accent-primary)]/10">
+                <textarea
+                  rows={2}
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  placeholder="Ask anything..."
+                  className="w-full resize-none bg-transparent px-2 py-1.5 text-sm text-[var(--text-main)] outline-none placeholder:text-[var(--text-muted)]"
+                />
+
+                <div className="mt-0 flex items-center justify-between pt-2">
+                  {/* Left Action Buttons */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      title="Attach files"
+                      aria-label="Attach files"
+                      className="rounded-lg p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                    >
+                      <Paperclip size={18} strokeWidth={1.8} />
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Voice input"
+                      aria-label="Voice input"
+                      className="rounded-lg p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                    >
+                      <Mic size={18} strokeWidth={1.8} />
+                    </button>
+                  </div>
+
+                  {/* Send Button */}
+                  <button
+                    type="button"
+                    onClick={handleSend}
+                    disabled={!message.intent?.trim() && !message.trim()}
+                    title="Send message"
+                    aria-label="Send message"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent-primary)] text-white shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                  >
+                    <ArrowUp size={18} strokeWidth={2.4} />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
