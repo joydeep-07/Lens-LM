@@ -7,7 +7,13 @@ import SidePanel from "./SidePanel";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
-  const [leftWidth, setLeftWidth] = useState(60); // Percentage width of the left panel
+  
+  // Initialize state from sessionStorage if available, default to 60
+  const [leftWidth, setLeftWidth] = useState(() => {
+    const savedWidth = sessionStorage.getItem("chatLeftWidth");
+    return savedWidth ? parseFloat(savedWidth) : 60;
+  });
+  
   const isDragging = useRef(false);
 
   const handleMouseDown = () => {
@@ -33,6 +39,12 @@ const ChatBot = () => {
       isDragging.current = false;
       document.body.style.cursor = "default";
       document.body.style.userSelect = "auto";
+
+      // Save the current width to session storage when dragging ends
+      setLeftWidth((currentWidth) => {
+        sessionStorage.setItem("chatLeftWidth", currentWidth);
+        return currentWidth;
+      });
     }
   }, []);
 
