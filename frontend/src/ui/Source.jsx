@@ -27,7 +27,7 @@ const Source = () => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-3 h-full overflow-hidden bg-[var(--bg-main)]">
+    <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-2 h-full overflow-hidden bg-[var(--bg-main)]">
       
       {/* Sources Navbar */}
       <nav className="flex items-center justify-between rounded-xl px-4 py-3 shrink-0">
