@@ -4,7 +4,7 @@ import ChatBot from "../ui/ChatBot";
 import Auth from "./Auth";
 
 const Home = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
 
   return (
     <>
