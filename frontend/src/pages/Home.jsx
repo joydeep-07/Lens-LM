@@ -1,24 +1,12 @@
-import React, { useState } from "react";
-import Banner from "../ui/Banner";
+import React from "react";
+import { useSelector } from "react-redux";
 import ChatBot from "../ui/ChatBot";
 import Auth from "./Auth";
 
 const Home = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  return (
-    <>
-      {isLogin ? (
-        <>
-          <ChatBot />
-        </>
-      ) : (
-        <>
-          <Auth />
-        </>
-      )}
-    </>
-  );
+  return isAuthenticated ? <ChatBot /> : <Auth />;
 };
 
 export default Home;
