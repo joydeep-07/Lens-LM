@@ -16,7 +16,14 @@ const ChatInput = ({
   setIsLevelDropdownOpen,
   models,
   levels,
+  completedQuestions = 0, 
 }) => {
+
+  const radius = 8;
+  const circumference = 2 * Math.PI * radius;
+  const progressPercent = Math.min(Math.max(completedQuestions, 0), 10) / 10;
+  const strokeDashoffset = circumference - progressPercent * circumference;
+
   return (
     <div className="bg-[var(--bg-main)] rounded-2xl z-10">
       <div className="relative flex w-full h-32 flex-col justify-between rounded-2xl border border-[var(--border-light)]/50 bg-[var(--bg-card)]/10 p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/30">
@@ -83,7 +90,7 @@ const ChatInput = ({
               )}
             </div>
 
-            {/* Level Selector (High / Medium / Low) */}
+            {/* Level Selector with Partially Colored SVG Circle */}
             <div className="relative">
               <button
                 type="button"
@@ -93,11 +100,32 @@ const ChatInput = ({
                 }}
                 className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-main)] hover:opacity-80"
               >
-                <CircleSmall
-                  size={16}
-                  strokeWidth={1.75}
-                  className="text-[var(--text-muted)]"
-                />
+                {/* Partial Circular SVG */}
+                <svg className="w-4 h-4 -rotate-90" viewBox="0 0 20 20">
+                  {/* Background track */}
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r={radius}
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    fill="none"
+                    className="text-[var(--text-muted)] opacity-30"
+                  />
+                  {/* Progress arc colored with --google-green */}
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r={radius}
+                    stroke="var(--google-green)"
+                    strokeWidth="2.5"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    fill="none"
+                    style={{ transition: "stroke-dashoffset 0.35s ease" }}
+                  />
+                </svg>
                 <span>{selectedLevel}</span>
               </button>
 

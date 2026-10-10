@@ -20,6 +20,12 @@ const ChatBot = () => {
   const models = ["Nova Mini", "Nova Pro", "Lens Ultra"];
   const levels = ["High", "Medium", "Low"];
 
+  // Track completed questions based on user message count (capped at 10)
+  const completedQuestions = Math.min(
+    messages.filter((msg) => msg.sender === "user").length,
+    10,
+  );
+
   // Initialize state from sessionStorage if available, default to 60
   const [leftWidth, setLeftWidth] = useState(() => {
     const savedWidth = sessionStorage.getItem("chatLeftWidth");
@@ -131,10 +137,10 @@ const ChatBot = () => {
                       }`}
                     >
                       <div
-                        className={`max-w-[80%] px-4 py-2.5 text-sm ${
+                        className={`max-w-[80%] px-4 py-2.5 text-xs ${
                           msg.sender === "user"
-                            ? "bg-[var(--bg-secondary)] rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)] border border-[var(--border-light)]"
-                            : "text-[var(--text-main)] w-full"
+                            ? "bg-[var(--bg-secondary)] text-justify rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)]/80 leading-5.5 tracking-wide border border-[var(--border-light)]"
+                            : "text-[var(--text-main)] w-full text-[var(--text-main)]/80 leading-5.5 tracking-wide "
                         }`}
                       >
                         {msg.text}
@@ -198,6 +204,7 @@ const ChatBot = () => {
               setIsLevelDropdownOpen={setIsLevelDropdownOpen}
               models={models}
               levels={levels}
+              completedQuestions={completedQuestions}
             />
           </div>
         </div>

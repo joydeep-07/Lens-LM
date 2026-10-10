@@ -90,3 +90,9 @@ button {
 .font-heading {
   font-family: "Genos", sans-serif;
 }
+
+
+::-webkit-scrollbar{
+  display: none;
+}
+
