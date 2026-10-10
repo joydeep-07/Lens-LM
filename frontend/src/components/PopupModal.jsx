@@ -19,7 +19,7 @@ const PopupModal = ({
 
       const tl = gsap.timeline({
         onComplete: () => {
-          setShowModal(false); // Unmount after animation finishes
+          setShowModal(false); 
         },
       });
 
