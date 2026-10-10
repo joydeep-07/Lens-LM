@@ -9,12 +9,12 @@ import {
   Volume2,
   ChevronDown,
   Sparkles,
+  CircleSmall,
 } from "lucide-react";
 
 import Source from "./Source";
 import EmptyChat from "./EmptyChat";
 import SidePanel from "./SidePanel";
-import BlurCircle from "../components/BlurCircle";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -127,14 +127,6 @@ const ChatBot = () => {
 
           {/* Main Chat Area */}
           <div className="relative flex flex-1 flex-col h-full overflow-hidden">
-            {/* Google Color Glow — Consistent Background Positions */}
-            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-              <BlurCircle top="10%" left="15%" color="blue" />
-              <BlurCircle top="30%" right="10%" color="red" />
-              <BlurCircle bottom="10%" left="25%" color="yellow" />
-              <BlurCircle bottom="15%" right="20%" color="green" />
-            </div>
-
             {/* Chat Messages / Empty State Area */}
             <div className="flex-1 overflow-y-auto pb-2 px-2 z-10">
               {messages.length === 0 ? (
@@ -202,7 +194,7 @@ const ChatBot = () => {
 
             {/* Message Input Container */}
             <div className="bg-[var(--bg-main)] rounded-2xl z-10">
-              <div className="relative flex w-full flex-col justify-between rounded-2xl border border-[var(--border-light)]/50 bg-[var(--bg-card)]/10 p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/30">
+              <div className="relative flex w-full h-32 flex-col justify-between rounded-2xl border border-[var(--border-light)]/50 bg-[var(--bg-card)]/10 p-3 shadow-sm transition-all focus-within:border-[var(--accent-primary)]/30">
                 {/* Textarea */}
                 <textarea
                   rows={2}
@@ -279,10 +271,21 @@ const ChatBot = () => {
                         }}
                         className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-main)] hover:opacity-80"
                       >
-                        <Sparkles
-                          size={13}
-                          className="text-[var(--accent-primary)]"
-                        />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.75"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-circle-small preview-icon"
+                        >
+                          <circle cx="12" cy="12" r="6" />
+                        </svg>
+                        
                         <span>{selectedLevel}</span>
                       </button>
 

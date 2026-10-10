@@ -1,6 +1,5 @@
 import React from "react";
 import GradientText from "../components/GradientText";
-import BlurCircle from "../components/BlurCircle";
 
 const EmptyChat = () => {
   const suggestions = [
@@ -20,13 +19,7 @@ const EmptyChat = () => {
 
   return (
     <div className="relative flex h-full flex-col justify-between overflow-hidden px-8 py-10">
-      {/* Google Color Glow — Random Positions */}
-      <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
-        <BlurCircle top="15%" left="20%" color="blue" />
-        <BlurCircle top="25%" right="15%" color="red" />
-        <BlurCircle bottom="15%" left="35%" color="yellow" />
-        <BlurCircle bottom="20%" right="25%" color="green" />
-      </div>
+     
 
       {/* Greeting */}
       <div className="relative z-10">
@@ -41,7 +34,7 @@ const EmptyChat = () => {
           </h1>
         </GradientText>
 
-        <p className="max-w-sm text-sm font-light leading-relaxed tracking-wide text-[var(--text-secondary)]">
+        <p className="max-w-lg text-sm font-normal leading-relaxed tracking-wide text-[var(--text-secondary)]">
           Upload documents, ask questions, and get intelligent answers, concise
           summaries, and clear explanations.
         </p>

@@ -6,6 +6,8 @@ const BlurCircle = ({
   right = "auto",
   bottom = "auto",
   color = "blue",
+  size = "w-85 h-85", // Default size for ambient light
+  opacity = 0.15, // Adjustable opacity
 }) => {
   const googleColors = {
     blue: "var(--google-blue)",
@@ -14,16 +16,19 @@ const BlurCircle = ({
     green: "var(--google-green)",
   };
 
+  const selectedColor = googleColors[color] || googleColors.blue;
+
   return (
     <div
-      className="absolute -z-50 h-58 w-58 aspect-square rounded-full blur-3xl"
+      className={`pointer-events-none absolute -z-10 rounded-full ${size}`}
       style={{
         top,
         left,
         right,
         bottom,
-        backgroundColor: googleColors[color] || googleColors.blue,
-        opacity: 0.1,
+        opacity : 0.1,
+        // Smooth radial gradient fading from 100% center opacity to completely transparent at the outer edge
+        background: `radial-gradient(circle, ${selectedColor} 0%, transparent 70%)`,
       }}
     />
   );

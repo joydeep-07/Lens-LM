@@ -11,12 +11,12 @@
   --bg-secondary: #121212;
   --bg-card: #1a1a1a;
 
+  /* Kept consistent */
   --text-main: #ffffff;
-  --text-secondary: #c7c7c7;
+  --text-secondary: #908f8f;
   --text-muted: #8a8a8a;
 
   --accent-primary: #b2d959;
-
   --border-light: #292929;
 
   /* Google Brand Colors */
@@ -36,16 +36,15 @@
   --bg-secondary: #f0f1f3;
   --bg-card: #ffffff;
 
-  --text-main: #171717;
-  --text-secondary: #525252;
-  --text-muted: #737373;
+  /* Text colors kept identical to dark theme */
+  --text-main: #ffffff;
+  --text-secondary: #908f8f;
+  --text-muted: #8a8a8a;
 
   --accent-primary: #5d8c14;
-
-  /* Adjusted to a darker gray for clear visibility on white backgrounds */
   --border-light: #d1d5db;
 
-  /* Google Brand Colors (adjusted slightly darker for better contrast on light backgrounds) */
+  /* Google Brand Colors */
   --google-blue: #1a73e8;
   --google-red: #ea4335;
   --google-yellow: #fbbc05;
@@ -65,11 +64,11 @@ body,
 body {
   margin: 0;
   background-color: var(--bg-main);
+  color: var(--text-main);
 }
 
 * {
   box-sizing: border-box;
-  color: var(--text-main);
   transition:
     background-color 0.25s ease,
     color 0.25s ease;

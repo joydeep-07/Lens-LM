@@ -3,7 +3,6 @@ import { FileText, Plus, File, X, Upload, Coffee } from "lucide-react";
 import EmptySource from "./EmptySource";
 import QrCode from "./QrCode";
 import PopupModal from "../components/PopupModal";
-import BlurCircle from "../components/BlurCircle";
 const Source = () => {
   const fileInputRef = useRef(null);
 
@@ -29,12 +28,7 @@ const Source = () => {
 
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-3 h-full overflow-hidden bg-[var(--bg-main)]">
-      <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
-        <BlurCircle top="15%" left="20%" color="blue" />
-        <BlurCircle top="25%" right="15%" color="red" />
-        <BlurCircle bottom="15%" left="35%" color="yellow" />
-        <BlurCircle bottom="20%" right="25%" color="green" />
-      </div>
+      
       {/* Sources Navbar */}
       <nav className="flex items-center justify-between rounded-xl px-4 py-3 shrink-0">
         <div className="flex items-center gap-2">

@@ -2,17 +2,11 @@
 import React from "react";
 import { BadgeCheck, FileText, Plus, Sparkles } from "lucide-react";
 import Logo from "../components/Logo";
-import BlurCircle from "../components/BlurCircle";
 
 const EmptySource = () => {
   return (
     <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
-      <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
-        <BlurCircle top="15%" left="20%" color="blue" />
-        <BlurCircle top="25%" right="15%" color="red" />
-        <BlurCircle bottom="15%" left="35%" color="yellow" />
-        <BlurCircle bottom="20%" right="25%" color="green" />
-      </div>
+      
       {/* Skeleton Preview */}
       <div className="relative mb-8 w-full max-w-74">
         {/* Floating File Icon */}
