@@ -8,11 +8,41 @@ const PopupModal = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const modalRef = useRef(null);
   const backdropRef = useRef(null);
 
   const toggleModal = () => {
-    setIsOpen(!isOpen);
+    if (isOpen) {
+      // Trigger close animation
+      setIsOpen(false);
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setShowModal(false); // Unmount after animation finishes
+        },
+      });
+
+      tl.to(modalRef.current, {
+        opacity: 0,
+        scale: 0.97,
+        y: 4,
+        duration: 0.2,
+        ease: "power2.in",
+      }).to(
+        backdropRef.current,
+        {
+          opacity: 0,
+          duration: 0.15,
+          ease: "power1.in",
+        },
+        "-=0.15", // Overlap slightly for a smoother fade out
+      );
+    } else {
+      // Open modal and trigger entrance animation
+      setShowModal(true);
+      setIsOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -45,11 +75,12 @@ const PopupModal = ({
         </button>
       </div>
 
-      {isOpen && (
+      {showModal && (
         <div
           ref={backdropRef}
           onClick={toggleModal}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
+          style={{ opacity: 0 }} // Start at 0 to avoid a flash before GSAP kicks in
         >
           {/* Stop propagation so clicking inside the modal doesn't close it */}
           <div ref={modalRef} onClick={(e) => e.stopPropagation()}>
