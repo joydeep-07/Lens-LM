@@ -65,7 +65,7 @@ export default function DeleteModal({ isOpen, onCancel, onConfirm }) {
           <Trash2 className="text-red-500" size={21} />
         </div>
 
-        <h2 className="text-[var(--text-main)] font-semibold mt-4 text-xl">
+        <h2 className="text-[var(--text-main)] font-semibold tracking-wide mt-4 text-md">
           Do you want to delete ?
         </h2>
 
