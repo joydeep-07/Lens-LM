@@ -9,6 +9,7 @@ import rateLimit from "express-rate-limit";
 import multer from "multer";
 
 import authRoutes from "./routes/auth.route.js";
+import chatRoutes from "./routes/chat.route.js";
 
 const app = express();
 
@@ -64,14 +65,12 @@ try {
   );
 }
 
-// Configure only when the application is behind one
-// correctly configured, trusted reverse proxy.
 if (isProduction) {
   app.set("trust proxy", 1);
 }
 
 // ----------------------------------------------------
-// General security.
+// General security & CORS.
 // ----------------------------------------------------
 
 app.disable("x-powered-by");
@@ -83,10 +82,6 @@ app.use(
     },
   }),
 );
-
-// ----------------------------------------------------
-// CORS.
-// ----------------------------------------------------
 
 app.use(
   cors({
@@ -117,7 +112,7 @@ app.use(
 app.use(cookieParser());
 
 // ----------------------------------------------------
-// General API rate limit.
+// Rate limits.
 // ----------------------------------------------------
 
 const apiLimiter = rateLimit({
@@ -132,10 +127,6 @@ const apiLimiter = rateLimit({
 });
 
 app.use("/api", apiLimiter);
-
-// ----------------------------------------------------
-// OTP rate limits.
-// ----------------------------------------------------
 
 const otpRequestLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -174,13 +165,14 @@ app.get("/api/health", (req, res) => {
 });
 
 // ----------------------------------------------------
-// Authentication, profile, chat, and file routes.
+// Routes.
 // ----------------------------------------------------
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", chatRoutes);
 
 // ----------------------------------------------------
-// Unknown routes.
+// Unknown routes & error handling.
 // ----------------------------------------------------
 
 app.use((req, res) => {
@@ -190,16 +182,11 @@ app.use((req, res) => {
   });
 });
 
-// ----------------------------------------------------
-// Central error handler.
-// ----------------------------------------------------
-
 app.use((error, req, res, next) => {
   if (res.headersSent) {
     return next(error);
   }
 
-  // Request body exceeds express.json() limit.
   if (error.type === "entity.too.large" || error.status === 413) {
     return res.status(413).json({
       success: false,
@@ -207,7 +194,6 @@ app.use((error, req, res, next) => {
     });
   }
 
-  // Handle malformed JSON.
   if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
     return res.status(400).json({
       success: false,
@@ -215,7 +201,6 @@ app.use((error, req, res, next) => {
     });
   }
 
-  // Handle file upload errors from Multer.
   if (error instanceof multer.MulterError) {
     const messages = {
       LIMIT_FILE_SIZE: "Each file must be 10 MB or smaller.",
@@ -235,7 +220,6 @@ app.use((error, req, res, next) => {
     });
   }
 
-  // Handle unsupported file types rejected by fileFilter.
   if (
     error.message === "Only PDF, TXT, and DOCX files are allowed." ||
     error.message === "Unsupported file type."
@@ -246,7 +230,6 @@ app.use((error, req, res, next) => {
     });
   }
 
-  // Handle Mongoose validation errors.
   if (error instanceof mongoose.Error.ValidationError) {
     return res.status(400).json({
       success: false,
@@ -254,7 +237,6 @@ app.use((error, req, res, next) => {
     });
   }
 
-  // Avoid exposing internal errors to clients.
   console.error("Unhandled server error:", error);
 
   return res.status(500).json({
@@ -264,7 +246,7 @@ app.use((error, req, res, next) => {
 });
 
 // ----------------------------------------------------
-// Connect MongoDB and start the server.
+// Connect MongoDB and start server.
 // ----------------------------------------------------
 
 const startServer = async () => {
