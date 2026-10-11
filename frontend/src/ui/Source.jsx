@@ -3,6 +3,7 @@ import { FileText, Plus, File, X, Upload, Coffee, Dot } from "lucide-react";
 import EmptySource from "./EmptySource";
 import QrCode from "./QrCode";
 import PopupModal from "../components/PopupModal";
+
 const Source = () => {
   const fileInputRef = useRef(null);
 
@@ -26,12 +27,42 @@ const Source = () => {
     );
   };
 
+  // Helper function to determine which icon to show based on file extension
+  const getFileIcon = (fileName) => {
+    const extension = fileName.split(".").pop().toLowerCase();
+
+    if (["doc", "docx"].includes(extension)) {
+      return "./word.svg";
+    }
+
+     if (["pdf",].includes(extension)) {
+       return "./pdf.svg";
+     }
+    if (["xls", "xlsx", "csv"].includes(extension)) {
+      return "./excel.svg";
+    }
+
+    if (["jpg", "png", "jpeg"].includes(extension)) {
+      return "./image.svg";
+    }
+
+    if (["js", "jsx",].includes(extension)) {
+      return "./javascript.svg";
+    }
+
+      if (["html", "css"].includes(extension)) {
+        return "./html.svg";
+      }
+    // Fallback for PDF, TXT, MD, images, or any other file type
+    return "./icons.svg";
+  };
+
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-2 h-full overflow-hidden bg-[var(--bg-main)]">
       {/* Sources Navbar */}
-      <nav className="flex items-center justify-between rounded-xl px-4 py-3 shrink-0">
+      <nav className="flex items-center justify-between rounded-xl px-3 py-3 shrink-0">
         <div className="flex items-center justify-between gap-2">
-         <img src="./icons.svg" className="w-10" alt="" />
+          <img src="./icons.svg" className="w-6" alt="" />
           <h2 className="text-xl font-light font-heading"> Sources</h2>
 
           {files.length > 0 && (
@@ -55,7 +86,7 @@ const Source = () => {
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".pdf,.txt,.doc,.docx,.md,.csv,.jpg,.png"
+        accept=".pdf,.txt,.doc,.docx,.md,.csv,.xls,.xlsx,.jpg,.png, .js, .py, .jsx, .html, .css"
         className="hidden"
         onChange={(event) => {
           handleFiles(event.target.files);
@@ -89,14 +120,12 @@ const Source = () => {
                   key={`${file.name}-${file.size}-${index}`}
                   className="flex items-center gap-3 rounded-sm border border-[var(--border-light)]/10 bg-[var(--bg-card)]/30 p-3 transition-all hover:border-[var(--border-light)]/50"
                 >
-                  <div className="flex w-7 shrink-0 items-center justify-cente">
-                    {/* <File
-                      size={20}
-                      strokeWidth={1.7}
-                      className="text-[var(--text-secondary)]"
-                    /> */}
-
-                    <img src="./word.svg" className="h-8.5" alt="" />
+                  <div className="flex w-7 shrink-0 items-center justify-center">
+                    <img
+                      src={getFileIcon(file.name)}
+                      className="h-8.5"
+                      alt=""
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1">
