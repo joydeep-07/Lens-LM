@@ -69,7 +69,7 @@ const PopupModal = ({
           onClick={toggleModal}
           title={title}
           aria-label={ariaLabel}
-          className="p-2.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors"
+          className="p-2.5 rounded-sm text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors"
         >
           {Icon && <Icon size={16} />}
         </button>

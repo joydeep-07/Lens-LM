@@ -7,6 +7,9 @@ import {
   CircleFadingPlus,
   HistoryIcon,
   File,
+  Layout,
+  LayoutDashboard,
+  ChartBar,
 } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
 import PopupModal from "../components/PopupModal";
@@ -30,7 +33,7 @@ const SidePanel = ({ onNewChat }) => {
         <div className="flex flex-col gap-2 w-full items-center">
           {/* Reusable Popup for Chat History */}
           <PopupModal
-            icon={HistoryIcon}
+            icon={MessageSquare}
             title="Chat History"
             ariaLabel="Chat History"
           >
@@ -42,8 +45,12 @@ const SidePanel = ({ onNewChat }) => {
             <StarredChats />
           </PopupModal> */}
 
-          <PopupModal icon={File} title="Starred" ariaLabel="Starred">
-            <Files/>
+          <PopupModal
+            icon={LayoutDashboard}
+            title="Starred"
+            ariaLabel="Starred"
+          >
+            <Files />
           </PopupModal>
         </div>
       </div>

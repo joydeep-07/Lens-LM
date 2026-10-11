@@ -181,7 +181,7 @@ const handleDownloadFile = async (file) => {
             }}
             className={
               viewMode === "Grid"
-                ? "grid grid-cols-1 md:grid-cols-2 gap-3"
+                ? "grid grid-cols-1 md:grid-cols-3 gap-3"
                 : "grid grid-cols-2 md:grid-cols-4 gap-3"
             }
           >
@@ -203,12 +203,12 @@ const handleDownloadFile = async (file) => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
                     className="flex flex-col justify-between"
                   >
                     {viewMode === "Tiles" ? (
                       /* TILES VIEW (Card block layout) */
-                      <div className="h-full flex flex-col justify-between gap-3 rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-card)]/40 p-4 transition-colors hover:border-[var(--border-light)]/60 text-left">
+                      <div className="h-full flex flex-col justify-between gap-3 rounded-sm border border-[var(--border-light)]/20 bg-[var(--bg-card)]/40 p-4 transition-colors hover:border-[var(--border-light)]/60 text-left">
                         <div className="flex items-start justify-between">
                           <img
                             src={getFileIcon(fileName)}
@@ -244,13 +244,15 @@ const handleDownloadFile = async (file) => {
                           >
                             {fileName}
                           </p>
-                          <span className="inline-block truncate max-w-full bg-[var(--bg-secondary)]/60 py-0.5 rounded text-[10px] text-[var(--text-secondary)]">
-                            <span>{uploadDate}</span>
-                          </span>
-                        </div>
+                          <div className="flex justify-between">
+                            <span className="inline-block truncate max-w-full bg-[var(--bg-secondary)]/60 py-0.5 rounded text-[10px] text-[var(--text-secondary)]">
+                              <span>{uploadDate}</span>
+                            </span>
 
-                        <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] border-t border-[var(--border-light)]/10 pt-2">
-                          <span>{fileSize}</span>
+                            <div className="flex items-center font-medium justify-between text-[10px] text-[var(--text-muted)] border-t border-[var(--border-light)]/10">
+                              <span>{fileSize}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ) : (
