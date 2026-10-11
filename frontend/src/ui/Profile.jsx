@@ -22,62 +22,9 @@ import Logout from "./Logout";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import { updateUser } from "../redux/authSlice";
+import SegmentedControl from "../components/Segmented Control";
+import ToggleSwitch from "../components/ToggleSwitch";
 
-// Segmented Control
-const SegmentedControl = ({ options, value, onChange, layoutId }) => {
-  return (
-    <div className="relative flex shrink-0 rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] p-1">
-      {options.map((option) => {
-        const isActive = value === option;
-
-        return (
-          <button
-            type="button"
-            key={option}
-            onClick={() => onChange(option)}
-            className={`relative z-10 rounded-md px-3 py-1 text-xs transition-colors ${
-              isActive
-                ? "font-semibold text-[var(--text-main)]"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-main)]"
-            }`}
-          >
-            {isActive && (
-              <motion.div
-                layoutId={layoutId}
-                className="absolute inset-0 -z-10 rounded-md bg-[var(--bg-active,rgba(255,255,255,0.12))] shadow-sm"
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-
-            {option}
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-// Toggle Switch
-const ToggleSwitch = ({ checked, onChange }) => {
-  return (
-    <button
-      type="button"
-      aria-pressed={checked}
-      onClick={() => onChange(!checked)}
-      className={`mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors ${
-        checked
-          ? "bg-green-600"
-          : "border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.1))]"
-      }`}
-    >
-      <motion.div
-        className="h-4 w-4 rounded-full bg-white shadow-md"
-        animate={{ x: checked ? 16 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      />
-    </button>
-  );
-};
 
 // Generate a default name and username from the email address.
 const getDefaultProfile = (email) => {
@@ -355,16 +302,16 @@ const Profile = () => {
                     type="button"
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`relative flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left transition-colors ${
+                    className={`relative flex w-full items-center gap-2.5 rounded-xs px-3 py-2 text-left transition-colors ${
                       isActive
                         ? "font-semibold text-[var(--text-main)]"
-                        : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover,rgba(255,255,255,0.04))] hover:text-[var(--text-main)]"
+                        : "text-[var(--text-secondary)] hover:text-[var(--text-main)]/80 "
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeProfileSidebarTab"
-                        className="absolute inset-0 z-0 rounded-lg bg-[var(--bg-active,rgba(255,255,255,0.08))]"
+                        className="absolute inset-0 z-0 rounded-xs bg-[var(--bg-active,rgba(255,255,255,0.08))]"
                         transition={{
                           type: "spring",
                           stiffness: 400,
@@ -431,7 +378,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-green-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xs bg-green-600 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-green-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {saving ? (
                     <LoaderCircle size={15} className="animate-spin" />
@@ -447,14 +394,14 @@ const Profile = () => {
 
             {/* Feedback */}
             {error && (
-              <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
+              <div className="flex items-start gap-2 rounded-xs border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-400">
                 <AlertCircle size={15} className="mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             {success && (
-              <div className="flex items-start gap-2 rounded-lg border border-green-500/20 bg-green-500/5 p-3 text-xs text-green-500">
+              <div className="flex items-start gap-2 rounded-xs border border-green-500/20 bg-green-500/5 p-3 text-xs text-green-500">
                 <CheckCircle2 size={15} className="mt-0.5 shrink-0" />
                 <span>{success}</span>
               </div>
@@ -487,7 +434,7 @@ const Profile = () => {
                       value={email}
                       readOnly
                       disabled
-                      className="w-2/3 cursor-not-allowed rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2 text-xs text-[var(--text-secondary)] opacity-80 outline-none"
+                      className="w-2/3 cursor-not-allowed rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2.5 text-xs text-[var(--text-main)]/70 opacity-80 outline-none"
                     />
                   </div>
 
@@ -510,7 +457,7 @@ const Profile = () => {
                       maxLength={80}
                       placeholder="Enter your name"
                       autoComplete="name"
-                      className="w-2/3 rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2 text-xs transition-colors focus:border-green-500/50 focus:outline-none"
+                      className="w-2/3 rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2.5 text-xs transition-colors focus:border-green-500/50 focus:outline-none"
                     />
                   </div>
 
@@ -524,8 +471,8 @@ const Profile = () => {
                     </div>
 
                     <div className="w-2/3">
-                      <div className="flex items-center rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 focus-within:border-green-500/50">
-                        <span className="text-xs text-[var(--text-secondary)]">
+                      <div className="flex items-center rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 focus-within:border-green-500/50">
+                        <span className="text-sm text-[var(--text-main)]/70">
                           @
                         </span>
 
@@ -544,7 +491,7 @@ const Profile = () => {
                           maxLength={30}
                           autoComplete="username"
                           placeholder="your_username"
-                          className="min-w-0 flex-1 bg-transparent px-1.5 py-2 text-xs outline-none"
+                          className="min-w-0 flex-1 bg-transparent px-1.5 py-2.5 text-xs outline-none"
                         />
                       </div>
                     </div>
@@ -620,11 +567,11 @@ const Profile = () => {
           </form>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <div className="mb-3 rounded-xl border border-[var(--border-light)]/30 p-4">
+            <div className=" p-4">
               <Shield size={24} className="text-[var(--text-secondary)]" />
             </div>
 
-            <h3 className="text-sm font-semibold">
+            <h3 className="text-md font-semibold text-[var(--text-main)]/70 ">
               {navigationGroups
                 .flatMap((group) => group.items)
                 .find((item) => item.id === activeTab)?.label || "Settings"}
