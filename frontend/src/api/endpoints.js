@@ -18,6 +18,9 @@ const endpoints = {
   deleteChat: (chatId) =>
     `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,
 
+  sendMessage: (chatId) =>
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/messages`,
+
   // Files
   uploadFiles: (chatId) =>
     `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files`,

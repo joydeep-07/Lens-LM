@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
 import { fileTypeFromBuffer } from "file-type";
+import { getGroqChatCompletion } from "../services/ai.service.js";
 
 import Chat from "../models/chat.model.js";
 
@@ -424,6 +425,85 @@ export const deleteChatFile = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Unable to delete the file.",
+    });
+  }
+};
+
+// ======================================================
+// SEND MESSAGE & GET AI RESPONSE
+// POST /api/auth/chats/:chatId/messages
+// ======================================================
+
+export const sendChatMessage = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const { message, model } = req.body;
+
+    if (!isValidObjectId(chatId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid chat ID." });
+    }
+
+    if (!message || typeof message !== "string" || !message.trim()) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Message content is required." });
+    }
+
+    const chat = await Chat.findOne({ _id: chatId, user: req.user._id });
+
+    if (!chat) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Chat not found." });
+    }
+
+    // 1. Push user message to history
+    chat.messages.push({
+      role: "user",
+      content: message.trim(),
+    });
+
+    // 2. Map existing chat history for Groq context format
+    const formattedHistory = chat.messages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+
+    // Map frontend dropdown model names to actual Groq model IDs
+    const modelMap = {
+      "Nova Mini": "openai/gpt-oss-20b",
+      "Nova Pro": "openai/gpt-oss-120b",
+      "Lens Ultra": "openai/gpt-oss-120b",
+    };
+    const selectedGroqModel = modelMap[model] || "openai/gpt-oss-20b";
+
+    // 3. Get response from Groq
+    const aiResponseText = await getGroqChatCompletion(
+      formattedHistory,
+      selectedGroqModel,
+    );
+
+    // 4. Push assistant response to history
+    chat.messages.push({
+      role: "assistant",
+      content: aiResponseText,
+    });
+
+    chat.lastMessageAt = new Date();
+    await chat.save();
+
+    return res.status(200).json({
+      success: true,
+      message: aiResponseText,
+      messages: chat.messages,
+    });
+  } catch (error) {
+    console.error("Chat message error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process the AI response.",
     });
   }
 };

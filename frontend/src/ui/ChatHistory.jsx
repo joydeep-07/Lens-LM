@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -15,20 +15,66 @@ import {
 } from "lucide-react";
 
 import SegmentedControl from "../components/SegmentedControl";
-import chatsData from "../assets/dummyChats";
+import api from "../api/axios";
+import endpoints from "../api/endpoints";
 
 const ChatHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("All");
+  const [chats, setChats] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [activeChatData, setActiveChatData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [chats, setChats] = useState(() =>
-    chatsData.map((chat) => ({
-      ...chat,
-      pinned: chat.pinned ?? false,
-    })),
-  );
+  // Fetch all chats for the logged-in user on mount
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(endpoints.getChats);
+        const fetchedChats = (response.data.chats || []).map((chat) => ({
+          ...chat,
+          id: chat._id || chat.id,
+          pinned: chat.pinned ?? false,
+          messages: chat.messages || [],
+        }));
+        setChats(fetchedChats);
+        if (fetchedChats.length > 0) {
+          setSelectedChat(fetchedChats[0].id);
+        }
+      } catch (error) {
+        console.error("Failed to fetch chats:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const [selectedChat, setSelectedChat] = useState(chatsData[0]?.id ?? null);
+    fetchChats();
+  }, []);
+
+  // Fetch full single chat data when selectedChat changes
+  useEffect(() => {
+    if (!selectedChat) {
+      setActiveChatData(null);
+      return;
+    }
+
+    const fetchSingleChat = async () => {
+      try {
+        const response = await api.get(endpoints.getChat(selectedChat));
+        const chat = response.data.chat;
+        setActiveChatData({
+          ...chat,
+          id: chat._id || chat.id,
+          messages: chat.messages || [],
+        });
+      } catch (error) {
+        console.error("Failed to fetch chat details:", error);
+      }
+    };
+
+    fetchSingleChat();
+  }, [selectedChat]);
 
   // Toggle pin
   const togglePin = (id, e) => {
@@ -42,29 +88,35 @@ const ChatHistory = () => {
   };
 
   // Delete chat
-  const deleteChat = (id, e) => {
+  const deleteChat = async (id, e) => {
     e.stopPropagation();
 
-    setChats((prevChats) => {
-      const remaining = prevChats.filter((chat) => chat.id !== id);
+    try {
+      await api.delete(endpoints.deleteChat(id));
+      setChats((prevChats) => {
+        const remaining = prevChats.filter((chat) => chat.id !== id);
 
-      if (selectedChat === id) {
-        setSelectedChat(remaining[0]?.id ?? null);
-      }
+        if (selectedChat === id) {
+          setSelectedChat(remaining[0]?.id ?? null);
+        }
 
-      return remaining;
-    });
+        return remaining;
+      });
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
   };
 
   // Search by title or any message
   const filteredChats = chats.filter((chat) => {
     const query = searchQuery.toLowerCase().trim();
 
-    const matchesTitle = chat.title.toLowerCase().includes(query);
+    const matchesTitle = chat.title?.toLowerCase().includes(query) ?? false;
 
-    const matchesMessages = chat.messages.some((message) =>
-      message.content.toLowerCase().includes(query),
-    );
+    const matchesMessages =
+      chat.messages?.some((message) =>
+        message.content?.toLowerCase().includes(query),
+      ) ?? false;
 
     const matchesSearch = matchesTitle || matchesMessages;
 
@@ -75,13 +127,10 @@ const ChatHistory = () => {
     return matchesSearch;
   });
 
-  // Selected conversation
-  const activeChatData = chats.find((chat) => chat.id === selectedChat);
-
   // Get the first user message for the sidebar preview
   const getFirstUserMessage = (chat) => {
     return (
-      chat.messages.find((message) => message.role === "user")?.content ??
+      chat.messages?.find((message) => message.role === "user")?.content ??
       "No messages yet"
     );
   };
@@ -142,6 +191,8 @@ const ChatHistory = () => {
               <Search size={14} className="opacity-50 shrink-0" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search chats..."
                 className="bg-transparent border-none outline-none w-full text-[var(--text-main)] placeholder:text-[var(--text-secondary)]/50 text-xs"
               />
@@ -151,7 +202,11 @@ const ChatHistory = () => {
 
         {/* Conversation List */}
         <div className="flex-1 min-h-0 overflow-y-auto px-2 py-2 space-y-1">
-          {filteredChats.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12 text-xs text-[var(--text-muted)]">
+              Loading chats...
+            </div>
+          ) : filteredChats.length === 0 ? (
             <div className="text-center py-12 text-xs text-[var(--text-muted)]">
               No conversations found
             </div>
@@ -240,10 +295,11 @@ const ChatHistory = () => {
                   <div className="relative z-10 flex items-center justify-between pt-1 text-[10px] text-[var(--text-muted)]">
                     <span className="flex items-center gap-1">
                       <Clock size={10} />
-                      {chat.date ?? chat.category}
+                      {chat.date ??
+                        new Date(chat.updatedAt).toLocaleDateString()}
                     </span>
 
-                    <span>{chat.messages.length} msgs</span>
+                    <span>{chat.messages?.length ?? 0} msgs</span>
                   </div>
                 </div>
               );
@@ -267,12 +323,16 @@ const ChatHistory = () => {
             {/* COMPLETE CHAT HISTORY */}
             <section className="flex-1 min-h-0 overflow-y-auto px-6 py-5">
               <div className="flex flex-col gap-4 py-2">
-                {activeChatData.messages.map((message, index) => {
+                {activeChatData.messages?.map((message, index) => {
                   const isUser = message.role === "user";
 
                   return (
                     <motion.div
-                      key={message.id ?? `${activeChatData.id}-${index}`}
+                      key={
+                        message._id ??
+                        message.id ??
+                        `${activeChatData.id}-${index}`
+                      }
                       initial={{
                         opacity: 0,
                         y: 5,

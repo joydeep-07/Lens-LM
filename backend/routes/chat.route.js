@@ -9,6 +9,7 @@ import {
   deleteChatFile,
   upload,
 } from "../controllers/chat.controller.js";
+import { sendChatMessage } from "../controllers/chat.controller.js";
 
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.post("/chats", authMiddleware, createChat);
 router.get("/chats", authMiddleware, getChats);
 router.get("/chats/:chatId", authMiddleware, getChat);
 router.delete("/chats/:chatId", authMiddleware, deleteChat);
+
+router.post("/chats/:chatId/messages", authMiddleware, sendChatMessage);
 
 // =============================================
 // FILE MANAGEMENT

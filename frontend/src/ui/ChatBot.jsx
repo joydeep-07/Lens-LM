@@ -1,15 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { CircleFadingPlus, Copy, RotateCw, Volume2 } from "lucide-react";
+import api from "../api/axios"; 
+import endpoints from "../api/endpoints"; 
 
 import Source from "./Source";
 import EmptyChat from "./EmptyChat";
 import SidePanel from "./SidePanel";
 import ChatInput from "./ChatInput";
+import NewChatButton from "./NewChatButton";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [currentChatId, setCurrentChatId] = useState(null);
 
   // Model & Level state selectors
   const [selectedModel, setSelectedModel] = useState("Nova Mini");
@@ -71,26 +76,59 @@ const ChatBot = () => {
     };
   }, [handleMouseMove, handleMouseUp]);
 
-  const handleSend = () => {
-    if (!message.trim() || isLoading) return;
+ const handleSend = async () => {
+   if (!message.trim() || isLoading) return;
 
-    const userMessage = { sender: "user", text: message };
+   const userText = message;
+   const userMessage = { sender: "user", text: userText, role: "user" };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setMessage("");
-    setIsLoading(true);
+   setMessages((prev) => [...prev, userMessage]);
+   setMessage("");
+   setIsLoading(true);
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: "We're unable to connect to the backend server at the moment. This may be due to a temporary server issue or an unstable connection. Please try again in a few moments. Once the connection is restored, you'll be able to continue using the service as usual.",
-        },
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  };
+   try {
+     let chatId = currentChatId;
+
+     // If no active chat exists yet, create one automatically
+     if (!chatId) {
+       const createRes = await api.post(endpoints.createChat, {
+         title: userText.slice(0, 30),
+       });
+       chatId = createRes.data.chat.id;
+       setCurrentChatId(chatId);
+     }
+
+     // Send message to backend (Groq integration)
+     const response = await api.post(endpoints.sendMessage(chatId), {
+       message: userText,
+       model: selectedModel,
+     });
+
+     const botReply = {
+       sender: "bot",
+       text: response.data.message,
+       role: "assistant",
+     };
+     setMessages((prev) => [...prev, botReply]);
+   } catch (error) {
+     console.error("Failed to send message:", error);
+     setMessages((prev) => [
+       ...prev,
+       {
+         sender: "bot",
+         text: "We're unable to connect to the backend server or process your request right now. Please try again.",
+       },
+     ]);
+   } finally {
+     setIsLoading(false);
+   }
+ };
+
+ const handleNewChat = () => {
+   setCurrentChatId(null);
+   setMessages([]);
+   setMessage("");
+ };
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--main)] text-[var(--text-main)]">
@@ -107,14 +145,8 @@ const ChatBot = () => {
               Lens LM.
             </h1>
           </div>
-          <button
-            type="button"
-            title="New chat"
-            aria-label="New chat"
-            className="rounded-lg p-2 text-[var(--text-secondary)] hover:text-[var(--text-main)]"
-          >
-            <CircleFadingPlus size={19} strokeWidth={1.8} />
-          </button>
+
+          <NewChatButton onClick={handleNewChat} />
         </nav>
 
         <div className="flex h-full gap-2 w-full overflow-hidden">
