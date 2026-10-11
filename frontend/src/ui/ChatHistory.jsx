@@ -17,6 +17,7 @@ import {
 import SegmentedControl from "../components/SegmentedControl";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
+import RenderText from "../components/RenderText";
 
 const ChatHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -355,7 +356,9 @@ const ChatHistory = () => {
                             : "text-[var(--text-main)] w-full text-[var(--text-main)]/80 leading-5.5 tracking-wide"
                         }`}
                       >
-                        {message.content}
+
+                        <RenderText text={message.content} />
+                        
 
                         {/* Action Icons Below Bot Reply */}
                         {!isUser && (
