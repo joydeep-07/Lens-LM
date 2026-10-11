@@ -211,7 +211,8 @@ const ChatBot = () => {
 
         <div className="flex h-full gap-2 w-full overflow-hidden">
           {/* Side Navigation Panel */}
-          <SidePanel />
+          {/* Side Navigation Panel */}
+          <SidePanel onNewChat={handleNewChat} />
 
           {/* Main Chat Area */}
           <div className="relative flex flex-1 flex-col h-full overflow-hidden">

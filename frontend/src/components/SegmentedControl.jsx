@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 
 const SegmentedControl = ({ options, value, onChange, layoutId }) => {
@@ -11,7 +12,7 @@ const SegmentedControl = ({ options, value, onChange, layoutId }) => {
             type="button"
             key={option}
             onClick={() => onChange(option)}
-            className={`relative z-10 rounded-md px-3 py-1 text-xs transition-colors ${
+            className={`relative z-10 rounded-md px-3 py-1 text-xs transition-colors capitalize ${
               isActive
                 ? "font-semibold text-[var(--text-main)]"
                 : "text-[var(--text-secondary)] hover:text-[var(--text-main)]"
