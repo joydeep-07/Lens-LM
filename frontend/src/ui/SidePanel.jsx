@@ -40,15 +40,10 @@ const SidePanel = ({ onNewChat }) => {
             <ChatHistory />
           </PopupModal>
 
-          {/* Reusable Popup for Starred */}
-          {/* <PopupModal icon={Star} title="Starred" ariaLabel="Starred">
-            <StarredChats />
-          </PopupModal> */}
-
           <PopupModal
             icon={LayoutDashboard}
-            title="Starred"
-            ariaLabel="Starred"
+            title="Documents"
+            ariaLabel="Documents"
           >
             <Files />
           </PopupModal>

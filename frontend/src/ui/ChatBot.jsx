@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   CircleFadingPlus,
   Copy,
+  Check,
   RotateCw,
   Volume2,
   VolumeX,
@@ -22,6 +23,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   // Speech synthesis state
   const [speakingIndex, setSpeakingIndex] = useState(null);
@@ -60,6 +62,19 @@ const ChatBot = () => {
     isDragging.current = true;
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
+  };
+
+  const handleCopy = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
   };
 
   const handleMouseMove = useCallback((e) => {
@@ -246,13 +261,20 @@ const ChatBot = () => {
                           {msg.sender === "bot" && (
                             <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
                               <button
-                                onClick={() =>
-                                  navigator.clipboard.writeText(msg.text)
-                                }
+                                onClick={() => handleCopy(msg.text)}
                                 className="transition-colors hover:text-[var(--text-main)]"
-                                title="Copy"
+                                title={copied ? "Copied!" : "Copy"}
                               >
-                                <Copy size={15} strokeWidth={1.8} />
+                                {" "}
+                                {copied ? (
+                                  <Check
+                                    size={15}
+                                    strokeWidth={1.8}
+                                    className="text-green-500"
+                                  />
+                                ) : (
+                                  <Copy size={15} strokeWidth={1.8} />
+                                )}{" "}
                               </button>
                               <button
                                 onClick={handleRegenerate}
