@@ -3,53 +3,70 @@
 /* =========================
    DARK THEME (DEFAULT)
 ========================= */
+
 :root,
 [data-theme="dark"] {
   color-scheme: dark;
-  --main: black;
+
+  --main: #000000;
+
+  /* Backgrounds */
   --bg-main: #0a0a0a;
   --bg-secondary: #121212;
   --bg-card: #1a1a1a;
 
-  /* Kept consistent */
+  /* Text */
   --text-main: #ffffff;
-  --text-secondary: #908f8f;
-  --text-muted: #8a8a8a;
+  --text-secondary: #b0b0b0;
+  --text-muted: #808080;
 
+  /* Primary Accent */
   --accent-primary: #b2d959;
+
+  /* Borders */
   --border-light: #292929;
 
-  /* Google Brand Colors */
-  --google-blue: #387ded;
-  --google-red: #bf382c;
-  --google-yellow: #fdd663;
-  --google-green: #81c995;
-}
-
-/* =========================
-   LIGHT THEME
-========================= */
-[data-theme="light"] {
-  color-scheme: light;
-  --main: white;
-  --bg-main: #f8f9fa;
-  --bg-secondary: #f0f1f3;
-  --bg-card: #ffffff;
-
-  /* Text colors kept identical to dark theme */
-  --text-main: #272626;
-  --text-secondary: #908f8f;
-  --text-muted: #8a8a8a;
-
-  --accent-primary: #5d8c14;
-  --border-light: #d1d5db;
-
-  /* Google Brand Colors */
-  --google-blue: #1a73e8;
+  /* Original Google Brand Colors */
+  --google-blue: #4285f4;
   --google-red: #ea4335;
   --google-yellow: #fbbc05;
   --google-green: #34a853;
 }
+
+
+/* =========================
+   LIGHT THEME
+========================= */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --main: #ffffff;
+
+  /* Backgrounds */
+  --bg-main: #f8f9fa;
+  --bg-secondary: #f1f3f4;
+  --bg-card: #b4b5b6;
+
+  /* Text */
+  --text-main: #202124;
+  --text-secondary: #5f6368;
+  --text-muted: #80868b;
+
+  /* Primary Accent */
+  --accent-primary: #5d8c14;
+
+  /* Borders */
+  --border-light: #dadce0;
+
+  /* Original Google Brand Colors */
+  --google-blue: #4285f4;
+  --google-red: #ea4335;
+  --google-yellow: #fbbc05;
+  --google-green: #34a853;
+}
+
+
 
 /* =========================
    GLOBAL STYLES

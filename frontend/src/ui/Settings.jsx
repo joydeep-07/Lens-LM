@@ -74,7 +74,7 @@ const Settings = () => {
   return (
     <div className="border border-[var(--border-light)]/50 flex overflow-hidden rounded-xl h-150 w-6xl bg-[var(--bg-main)] text-[var(--text-main)] shadow-2xl">
       {/* Sidebar Navigation */}
-      <div className="w-64 border-r border-[var(--border-light)]/30 flex flex-col bg-[var(--bg-sidebar,rgba(0,0,0,0.2))] select-none">
+      <div className="w-64 border-r border-[var(--border-light)]/30 flex flex-col bg-[var(--bg-secondary)]/50 select-none">
         <div className="px-4 pt-4 pb-2 text-sm uppercase tracking-wider text-[var(--text-main)]/80 font-medium">
           {activeTab === "general" ? <>Settings</> : <> {activeTab} </>}
         </div>
@@ -110,7 +110,7 @@ const Settings = () => {
                   {isActive && (
                     <motion.div
                       layoutId="activeSidebarTab"
-                      className="absolute inset-0 bg-[var(--bg-active,rgba(255,255,255,0.08))] rounded-xs z-0"
+                      className="absolute inset-0 bg-[var(--bg-card)]/50 rounded-xs z-0"
                       transition={{
                         type: "spring",
                         stiffness: 400,
@@ -149,7 +149,7 @@ const Settings = () => {
                   {isActive && (
                     <motion.div
                       layoutId="activeSidebarTab"
-                      className="absolute inset-0 bg-[var(--bg-active,rgba(255,255,255,0.08))] rounded-xs z-0"
+                      className="absolute inset-0 bg-[var(--bg-card)]/50 rounded-xs z-0"
                       transition={{
                         type: "spring",
                         stiffness: 400,
@@ -188,7 +188,7 @@ const Settings = () => {
                   {isActive && (
                     <motion.div
                       layoutId="activeSidebarTab"
-                      className="absolute inset-0 bg-[var(--bg-active,rgba(255,255,255,0.08))] rounded-xs z-0"
+                      className="absolute inset-0 bg-[var(--bg-card)]/50 rounded-xs z-0"
                       transition={{
                         type: "spring",
                         stiffness: 400,
@@ -222,7 +222,7 @@ const Settings = () => {
               {activeTab === "api-keys" && (
                 <motion.div
                   layoutId="activeSidebarTab"
-                  className="absolute inset-0 bg-[var(--bg-active,rgba(255,255,255,0.08))] rounded-xs z-0"
+                  className="absolute inset-0 bg-[var(--bg-card)]/50 rounded-xs z-0"
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />
               )}

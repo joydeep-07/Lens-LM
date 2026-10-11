@@ -22,7 +22,7 @@ import Logout from "./Logout";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import { updateUser } from "../redux/authSlice";
-import SegmentedControl from "../components/Segmented Control";
+import SegmentedControl from "../components/SegmentedControl";
 import ToggleSwitch from "../components/ToggleSwitch";
 
 
@@ -311,7 +311,7 @@ const Profile = () => {
                     {isActive && (
                       <motion.div
                         layoutId="activeProfileSidebarTab"
-                        className="absolute inset-0 z-0 rounded-xs bg-[var(--bg-card)]"
+                        className="absolute inset-0 z-0 rounded-xs bg-[var(--bg-card)]/50 "
                         transition={{
                           type: "spring",
                           stiffness: 400,
