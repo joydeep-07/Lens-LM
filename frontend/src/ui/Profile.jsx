@@ -253,7 +253,7 @@ const Profile = () => {
   const navigationGroups = [
     {
       items: [
-        { id: "public-profile", label: "Public profile", icon: User },
+        { id: "public-profile", label: "Profile", icon: User },
         {
           id: "account-security",
           label: "Account & Security",
@@ -279,7 +279,7 @@ const Profile = () => {
   return (
     <div className="flex h-150  w-6xl overflow-hidden rounded-xl border border-[var(--border-light)]/50 bg-[var(--bg-main)] text-[var(--text-main)] shadow-2xl">
       {/* Sidebar */}
-      <aside className="flex w-64 shrink-0 flex-col border-r border-[var(--border-light)]/30 bg-[var(--bg-sidebar,rgba(0,0,0,0.2))]">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-[var(--border-light)]/30 bg-[var(--bg-secondary)]/50">
         <div className="px-4 pb-2 pt-4 text-sm font-bold uppercase tracking-wider">
           Profile
         </div>
@@ -311,7 +311,7 @@ const Profile = () => {
                     {isActive && (
                       <motion.div
                         layoutId="activeProfileSidebarTab"
-                        className="absolute inset-0 z-0 rounded-xs bg-[var(--bg-active,rgba(255,255,255,0.08))]"
+                        className="absolute inset-0 z-0 rounded-xs bg-[var(--bg-card)]"
                         transition={{
                           type: "spring",
                           stiffness: 400,
@@ -362,7 +362,7 @@ const Profile = () => {
                 <div className="min-w-0">
                   <h2 className="flex items-center gap-2 text-base font-bold">
                     <span className="truncate">{fullName || "Your name"}</span>
-                    <BadgeCheck size={14} className="shrink-0 text-green-500" />
+                    <BadgeCheck size={14} className="shrink-0 text-[var(--google-blue)] " />
                   </h2>
 
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
