@@ -12,6 +12,7 @@ import {
   RotateCw,
   Volume2,
   ChevronRight,
+  FileText,
 } from "lucide-react";
 
 import SegmentedControl from "../components/SegmentedControl";
@@ -38,6 +39,7 @@ const ChatHistory = () => {
           id: chat._id || chat.id,
           pinned: chat.pinned ?? false,
           messages: chat.messages || [],
+          files: chat.files || chat.sources || [],
         }));
         setChats(fetchedChats);
         if (fetchedChats.length > 0) {
@@ -68,6 +70,7 @@ const ChatHistory = () => {
           ...chat,
           id: chat._id || chat.id,
           messages: chat.messages || [],
+          files: chat.files || chat.sources || [],
         });
       } catch (error) {
         console.error("Failed to fetch chat details:", error);
@@ -314,12 +317,39 @@ const ChatHistory = () => {
         {activeChatData ? (
           <>
             {/* Conversation Header */}
-            <header className="shrink-0 px-6 py-5 flex items-center gap-4 border-b border-[var(--border-light)]/40">
-              <img src="./logo.svg" className="h-6 w-6" alt="" />
-              <h2 className="text-md font-medium text-[var(--text-main)]/80">
-                {activeChatData.title}
-              </h2>
+            <header className="shrink-0 px-6 py-4 flex items-center justify-between gap-4 border-b border-[var(--border-light)]/40">
+              <div className="flex items-center gap-3">
+                <img src="./logo.svg" className="h-6 w-6" alt="" />
+                <h2 className="text-md font-medium text-[var(--text-main)]/80">
+                  {activeChatData.title}
+                </h2>
+              </div>
             </header>
+
+            {/* ATTACHED DOCUMENTS / SOURCES BAR (Displayed on top of chat) */}
+            {activeChatData.files && activeChatData.files.length > 0 && (
+              <div className="shrink-0 px-6 py-2.5 bg-[var(--bg-secondary)]/30 border-b border-[var(--border-light)]/30 flex items-center gap-2 overflow-x-auto">
+                <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider shrink-0">
+                  Attached Sources:
+                </span>
+                <div className="flex items-center gap-2">
+                  {activeChatData.files.map((file, fIdx) => (
+                    <div
+                      key={file._id || fIdx}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-card)] border border-[var(--border-light)]/50 text-xs text-[var(--text-main)] shrink-0"
+                    >
+                      <FileText
+                        size={13}
+                        className="text-[var(--google-blue)]"
+                      />
+                      <span className="truncate max-w-[150px]">
+                        {file.originalName || file.name || "Document"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* COMPLETE CHAT HISTORY */}
             <section className="flex-1 min-h-0 overflow-y-auto px-6 py-5">
@@ -356,9 +386,7 @@ const ChatHistory = () => {
                             : "text-[var(--text-main)] w-full text-[var(--text-main)]/80 leading-5.5 tracking-wide"
                         }`}
                       >
-
                         <RenderText text={message.content} />
-                        
 
                         {/* Action Icons Below Bot Reply */}
                         {!isUser && (

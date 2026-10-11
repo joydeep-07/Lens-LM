@@ -3,16 +3,61 @@ import { FileText, Plus, File, X, Upload, Coffee, Dot } from "lucide-react";
 import EmptySource from "./EmptySource";
 import QrCode from "./QrCode";
 import PopupModal from "../components/PopupModal";
+import api from "../api/axios";
+import endpoints from "../api/endpoints";
 
-const Source = () => {
+const Source = ({ chatId, onChatCreated }) => {
   const fileInputRef = useRef(null);
 
   const [files, setFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFiles = (selectedFiles) => {
-    const newFiles = Array.from(selectedFiles);
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  const handleFiles = async (selectedFiles) => {
+    const newFilesArray = Array.from(selectedFiles);
+    if (newFilesArray.length === 0) return;
+
+    try {
+      setIsUploading(true);
+      let activeChatId = chatId;
+
+      // If no active chat exists, automatically create a new one first
+      if (!activeChatId) {
+        const createRes = await api.post(endpoints.createChat, {
+          title: newFilesArray[0].name.slice(0, 30),
+        });
+        activeChatId = createRes.data.chat.id;
+        if (onChatCreated) {
+          onChatCreated(activeChatId);
+        }
+      }
+
+      const formData = new FormData();
+      newFilesArray.forEach((file) => {
+        formData.append("files", file); // Must match backend multer field name ('files')
+      });
+
+      const response = await api.post(
+        endpoints.uploadFiles(activeChatId),
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      const uploadedFiles = response.data.files || newFilesArray;
+      setFiles((prevFiles) => [...prevFiles, ...uploadedFiles]);
+    } catch (error) {
+      console.error("Failed to upload files:", error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to upload files. Please try again.",
+      );
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDrop = (event) => {
@@ -21,39 +66,31 @@ const Source = () => {
     handleFiles(event.dataTransfer.files);
   };
 
-  const removeFile = (indexToRemove) => {
-    setFiles((prevFiles) =>
-      prevFiles.filter((_, index) => index !== indexToRemove),
-    );
+  const removeFile = async (fileId, indexToRemove) => {
+    try {
+      if (fileId && chatId) {
+        await api.delete(endpoints.deleteFile(chatId, fileId));
+      }
+      setFiles((prevFiles) =>
+        prevFiles.filter((_, index) => index !== indexToRemove),
+      );
+    } catch (error) {
+      console.error("Failed to delete file:", error);
+      alert("Failed to delete file from server.");
+    }
   };
 
   // Helper function to determine which icon to show based on file extension
   const getFileIcon = (fileName) => {
+    if (!fileName) return "./icons.svg";
     const extension = fileName.split(".").pop().toLowerCase();
 
-    if (["doc", "docx"].includes(extension)) {
-      return "./word.svg";
-    }
-
-     if (["pdf",].includes(extension)) {
-       return "./pdf.svg";
-     }
-    if (["xls", "xlsx", "csv"].includes(extension)) {
-      return "./excel.svg";
-    }
-
-    if (["jpg", "png", "jpeg"].includes(extension)) {
-      return "./image.svg";
-    }
-
-    if (["js", "jsx",].includes(extension)) {
-      return "./javascript.svg";
-    }
-
-      if (["html", "css"].includes(extension)) {
-        return "./html.svg";
-      }
-    // Fallback for PDF, TXT, MD, images, or any other file type
+    if (["doc", "docx"].includes(extension)) return "./word.svg";
+    if (["pdf"].includes(extension)) return "./pdf.svg";
+    if (["xls", "xlsx", "csv"].includes(extension)) return "./excel.svg";
+    if (["jpg", "png", "jpeg"].includes(extension)) return "./image.svg";
+    if (["js", "jsx", "py"].includes(extension)) return "./javascript.svg";
+    if (["html", "css"].includes(extension)) return "./html.svg";
     return "./icons.svg";
   };
 
@@ -86,7 +123,7 @@ const Source = () => {
         ref={fileInputRef}
         type="file"
         multiple
-        accept=".pdf,.txt,.doc,.docx,.md,.csv,.xls,.xlsx,.jpg,.png, .js, .py, .jsx, .html, .css"
+        accept=".pdf,.txt,.doc,.docx,.md,.csv,.xls,.xlsx,.jpg,.png,.js,.py,.jsx,.html,.css"
         className="hidden"
         onChange={(event) => {
           handleFiles(event.target.files);
@@ -104,7 +141,7 @@ const Source = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <h3 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
-                  Added files
+                  Added files {isUploading && "(Uploading...)"}
                 </h3>
                 <button
                   type="button"
@@ -115,52 +152,61 @@ const Source = () => {
                 </button>
               </div>
 
-              {files.map((file, index) => (
-                <div
-                  key={`${file.name}-${file.size}-${index}`}
-                  className="flex items-center gap-3 rounded-sm border border-[var(--border-light)]/10 bg-[var(--bg-card)]/30 p-3 transition-all hover:border-[var(--border-light)]/50"
-                >
-                  <div className="flex w-7 shrink-0 items-center justify-center">
-                    <img
-                      src={getFileIcon(file.name)}
-                      className="h-8.5"
-                      alt=""
-                    />
-                  </div>
+              {files.map((file, index) => {
+                const fileName =
+                  file.originalName || file.name || "Untitled File";
+                const fileSize = file.size
+                  ? (file.size / 1024).toFixed(1) + " KB"
+                  : "";
+                const fileId = file._id || file.id;
 
-                  <div className="min-w-0 flex-1">
-                    <p
-                      title={file.name}
-                      className="truncate text-sm font-medium tracking-tight text-[var(--text-primary)]"
-                    >
-                      {file.name}
-                    </p>
-
-                    <div className="mt-1 flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                      <span>{(file.size / 1024).toFixed(1)} KB</span>
-
-                      <span className="h-1 w-1 rounded-full bg-[var(--text-muted)]/50" />
-
-                      <span className="inline-flex items-center gap-1.5 text-[var(--text-secondary)]/80 ">
-                        Ready
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    title={`Remove ${file.name}`}
-                    aria-label={`Remove ${file.name}`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      removeFile(index);
-                    }}
-                    className="rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                return (
+                  <div
+                    key={`${fileName}-${index}`}
+                    className="flex items-center gap-3 rounded-sm border border-[var(--border-light)]/10 bg-[var(--bg-card)]/30 p-3 transition-all hover:border-[var(--border-light)]/50"
                   >
-                    <X size={16} strokeWidth={1.8} />
-                  </button>
-                </div>
-              ))}
+                    <div className="flex w-7 shrink-0 items-center justify-center">
+                      <img
+                        src={getFileIcon(fileName)}
+                        className="h-8.5"
+                        alt=""
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p
+                        title={fileName}
+                        className="truncate text-sm font-medium tracking-tight text-[var(--text-primary)]"
+                      >
+                        {fileName}
+                      </p>
+
+                      <div className="mt-1 flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                        {fileSize && <span>{fileSize}</span>}
+                        {fileSize && (
+                          <span className="h-1 w-1 rounded-full bg-[var(--text-muted)]/50" />
+                        )}
+                        <span className="inline-flex items-center gap-1.5 text-[var(--text-secondary)]/80">
+                          {isUploading ? "Uploading..." : "Ready"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      title={`Remove ${fileName}`}
+                      aria-label={`Remove ${fileName}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeFile(fileId, index);
+                      }}
+                      className="rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                    >
+                      <X size={16} strokeWidth={1.8} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

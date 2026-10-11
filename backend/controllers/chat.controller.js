@@ -17,12 +17,41 @@ const MAX_FILES_PER_CHAT = 20;
 
 const UPLOAD_DIR = path.resolve("uploads");
 
-const ALLOWED_EXTENSIONS = new Set([".pdf", ".txt", ".docx"]);
+const ALLOWED_EXTENSIONS = new Set([
+  ".pdf",
+  ".txt",
+  ".doc",
+  ".docx",
+  ".md",
+  ".csv",
+  ".xls",
+  ".xlsx",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".js",
+  ".py",
+  ".jsx",
+  ".html",
+  ".css",
+]);
 
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
   "text/plain",
+  "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/markdown",
+  "text/csv",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "image/jpeg",
+  "image/png",
+  "text/javascript",
+  "application/javascript",
+  "text/x-python",
+  "text/html",
+  "text/css",
 ]);
 
 const isValidObjectId = (id) => /^[a-f\d]{24}$/i.test(String(id || ""));
@@ -65,11 +94,11 @@ export const upload = multer({
     const extension = path.extname(file.originalname).toLowerCase();
 
     if (!ALLOWED_EXTENSIONS.has(extension)) {
-      return callback(new Error("Only PDF, TXT, and DOCX files are allowed."));
+      return callback(new Error("Unsupported file extension."));
     }
 
     if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
-      return callback(new Error("Unsupported file type."));
+      return callback(new Error("Unsupported MIME type."));
     }
 
     callback(null, true);
@@ -297,19 +326,29 @@ export const uploadChatFiles = async (req, res) => {
 
     for (const file of req.files) {
       const extension = path.extname(file.originalname).toLowerCase();
-      const buffer = await fs.readFile(file.path);
-      const detected = await fileTypeFromBuffer(buffer.subarray(0, 4100));
 
       const validPdf =
-        extension === ".pdf" && detected?.mime === "application/pdf";
+        extension === ".pdf" && file.mimetype === "application/pdf";
       const validDocx =
-        extension === ".docx" && detected?.mime === "application/zip";
-      const validText =
-        extension === ".txt" &&
-        file.mimetype === "text/plain" &&
-        !buffer.includes(0);
+        extension === ".docx" && file.mimetype.includes("wordprocessingml");
+      const validImage =
+        [".jpg", ".jpeg", ".png"].includes(extension) &&
+        file.mimetype.startsWith("image/");
+      const validTextOrCode = [
+        ".txt",
+        ".md",
+        ".csv",
+        ".js",
+        ".py",
+        ".jsx",
+        ".html",
+        ".css",
+        ".xls",
+        ".xlsx",
+        ".doc",
+      ].includes(extension);
 
-      if (!validPdf && !validDocx && !validText) {
+      if (!validPdf && !validDocx && !validImage && !validTextOrCode) {
         throw new Error(
           `Unsupported or invalid file format: ${sanitizeFilename(file.originalname)}`,
         );

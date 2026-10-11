@@ -333,7 +333,10 @@ const ChatBot = () => {
 
       {/* Right Panel */}
       <div className="flex-1 h-full overflow-hidden">
-        <Source />
+        <Source
+          chatId={currentChatId}
+          onChatCreated={(newId) => setCurrentChatId(newId)}
+        />
       </div>
     </div>
   );
