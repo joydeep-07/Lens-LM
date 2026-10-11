@@ -11,6 +11,7 @@ import {
   Copy,
   RotateCw,
   Volume2,
+  ChevronRight,
 } from "lucide-react";
 
 import SegmentedControl from "../components/SegmentedControl";
@@ -346,13 +347,13 @@ const ChatHistory = () => {
                 onClick={() => {
                   console.log("Resume chat:", activeChatData.id);
                 }}
-                className="flex shrink-0 text-white items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium shadow-md transition-colors hover:opacity-90"
+                className="flex shrink-0 text-white tracking-wider items-center gap-2 px-4 py-2 rounded-xs text-xs font-medium shadow-md transition-colors hover:opacity-90"
                 style={{
                   backgroundColor: "var(--google-blue)",
                 }}
               >
                 Resume Chat
-                <ArrowRight size={14} />
+                <ChevronRight size={14} />
               </button>
             </footer>
           </>

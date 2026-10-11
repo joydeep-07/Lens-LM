@@ -10,7 +10,7 @@ const EmptySource = () => {
       {/* Skeleton Preview */}
       <div className="relative mb-8 w-full max-w-74">
         {/* Floating File Icon */}
-        <div className="absolute -right-2 -top-3 z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] shadow-sm">
+        <div className="absolute -right-2 -top-3 z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-main)] shadow-sm">
           <BadgeCheck size={19} strokeWidth={1.9} className="text-sky-600" />
         </div>
 
@@ -43,7 +43,7 @@ const EmptySource = () => {
         </div>
 
         {/* Floating Plus Icon */}
-        <div className="absolute -bottom-3 -left-3 flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-card)] shadow-sm">
+        <div className="absolute -bottom-3 -left-3 flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-light)] bg-[var(--bg-main)] shadow-sm">
           <Plus
             size={18}
             strokeWidth={1.8}
