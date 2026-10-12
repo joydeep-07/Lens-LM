@@ -6,14 +6,20 @@ const Logo = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Select all circle elements inside the container
-      const circles = containerRef.current.querySelectorAll(".circle");
+      const container = containerRef.current;
+      const circles = container.querySelectorAll(".circle");
 
       circles.forEach((circle, index) => {
-        // Randomize values slightly for each circle so they don't move in sync
-        const randomDuration = 2 + index * 0.5; // e.g., 2s, 2.5s, 3s, 3.5s
-        const randomX = (index % 2 === 0 ? 1 : -1) * (6 + index * 2);
-        const randomY = -8 - index * 3;
+        const randomDuration = 2 + index * 0.5;
+
+        // Make movement responsive to the container's current size
+        // We calculate movement relative to container width so it scales proportionally
+        const baseWidth = container.offsetWidth || 160;
+        const scaleFactor = baseWidth / 160; // normalized against original 40rem (160px)
+
+        const randomX =
+          (index % 2 === 0 ? 1 : -1) * (6 + index * 2) * scaleFactor;
+        const randomY = (-8 - index * 3) * scaleFactor;
 
         // Continuous floating / bouncing effect
         gsap.to(circle, {
@@ -23,10 +29,10 @@ const Logo = () => {
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-          delay: index * 0.2, // Stagger start times
+          delay: index * 0.2,
         });
 
-        // Subtle pulsing scale effect for a bouncy feel
+        // Subtle pulsing scale effect
         gsap.to(circle, {
           scale: 1.08,
           duration: randomDuration * 0.8,
@@ -38,25 +44,26 @@ const Logo = () => {
       });
     }, containerRef);
 
-    return () => ctx.revert(); // Clean up animations on unmount
+    return () => ctx.revert();
   }, []);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-40 h-40 flex items-center justify-center"
+      /* w-36 h-36 on mobile, scaling up to w-48 h-48 on large screens (or use w-full max-w-[...]) */
+      className="relative w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 flex items-center justify-center transition-all duration-300"
     >
       {/* Blue Circle (Large - Top Left) */}
-      <div className="circle absolute w-19.5 h-19.5 bg-blue-500 rounded-full top-1.5 left-4"></div>
+      <div className="circle absolute w-[48%] h-[48%] bg-blue-500 rounded-full top-[4%] left-[10%]"></div>
 
       {/* Red Circle (Medium - Center/Right overlapping blue) */}
-      <div className="circle absolute w-9.5 h-9.5 bg-red-500 rounded-full top-16 right-8 z-10"></div>
+      <div className="circle absolute w-[24%] h-[24%] bg-red-500 rounded-full top-[40%] right-[20%] z-10"></div>
 
       {/* Yellow Circle (Medium - Bottom Center) */}
-      <div className="circle absolute w-9.5 h-9.5 bg-amber-400 rounded-full bottom-4 right-8"></div>
+      <div className="circle absolute w-[24%] h-[24%] bg-amber-400 rounded-full bottom-[10%] right-[20%]"></div>
 
       {/* Green Circle (Small - Top Right) */}
-      <div className="circle absolute w-6 h-6 bg-green-500 rounded-full top-11 right-3"></div>
+      <div className="circle absolute w-[15%] h-[15%] bg-green-500 rounded-full top-[28%] right-[8%]"></div>
     </div>
   );
 };
