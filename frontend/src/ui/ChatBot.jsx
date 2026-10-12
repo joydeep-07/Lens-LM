@@ -17,6 +17,7 @@ import EmptyChat from "./EmptyChat";
 import SidePanel from "./SidePanel";
 import ChatInput from "./ChatInput";
 import NewChatButton from "./NewChatButton";
+import Wifi from "./Wifi";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -220,8 +221,10 @@ const ChatBot = () => {
               Lens LM.
             </h1>
           </div>
-
-          <NewChatButton onClick={handleNewChat} />
+          <div className="flex gap-1">
+            <Wifi />
+            <NewChatButton onClick={handleNewChat} />
+          </div>
         </nav>
 
         <div className="flex h-full gap-2 w-full overflow-hidden">
