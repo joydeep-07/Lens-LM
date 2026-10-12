@@ -18,6 +18,7 @@ import SidePanel from "./SidePanel";
 import ChatInput from "./ChatInput";
 import NewChatButton from "./NewChatButton";
 import Wifi from "./Wifi";
+import VoiceSelector from "./VoiceSelector";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -25,6 +26,7 @@ const ChatBot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [selectedVoiceUri, setSelectedVoiceUri] = useState("");
 
   // Speech synthesis state
   const [speakingIndex, setSpeakingIndex] = useState(null);
@@ -191,6 +193,17 @@ const ChatBot = () => {
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
+
+    const voices = window.speechSynthesis.getVoices();
+    const chosenVoice = voices.find((v) => v.voiceURI === selectedVoiceUri);
+
+    if (chosenVoice) {
+      utterance.voice = chosenVoice;
+    }
+
+    utterance.pitch = 0.95; // Fine-tune pitch
+    utterance.rate = 1.0;
+
     utterance.onend = () => setSpeakingIndex(null);
     utterance.onerror = () => setSpeakingIndex(null);
 
@@ -230,7 +243,11 @@ const ChatBot = () => {
         <div className="flex h-full gap-2 w-full overflow-hidden">
           {/* Side Navigation Panel */}
           {/* Side Navigation Panel */}
-          <SidePanel onNewChat={handleNewChat} />
+          <SidePanel
+            onNewChat={handleNewChat}
+            selectedVoiceUri={selectedVoiceUri}
+            setSelectedVoiceUri={setSelectedVoiceUri}
+          />
 
           {/* Main Chat Area */}
           <div className="relative flex flex-1 flex-col h-full overflow-hidden">

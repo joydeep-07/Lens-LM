@@ -10,6 +10,8 @@ import {
   Layout,
   LayoutDashboard,
   ChartBar,
+  Speaker,
+  Volume2,
 } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
 import PopupModal from "../components/PopupModal";
@@ -19,8 +21,9 @@ import Settings69 from "./Settings";
 import Profile from "./Profile";
 import NewChatButton from "./NewChatButton";
 import Files from "./Files";
+import VoiceSelector from "./VoiceSelector";
 
-const SidePanel = ({ onNewChat }) => {
+const SidePanel = ({ onNewChat, selectedVoiceUri, setSelectedVoiceUri }) => {
   return (
     <div className="w-12 h-full flex flex-col justify-between items-center py-4">
       {/* Top Section: New Chat & Main Navigation */}
@@ -46,6 +49,18 @@ const SidePanel = ({ onNewChat }) => {
             ariaLabel="Documents"
           >
             <Files />
+          </PopupModal>
+
+          {/* Voice Settings Modal */}
+          <PopupModal
+            icon={Volume2}
+            title="Voice Settings"
+            ariaLabel="Voice Settings"
+          >
+            <VoiceSelector
+              selectedVoiceUri={selectedVoiceUri}
+              setSelectedVoiceUri={setSelectedVoiceUri}
+            />
           </PopupModal>
         </div>
       </div>
