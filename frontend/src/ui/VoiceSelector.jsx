@@ -110,7 +110,7 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded transition-colors text-left relative ${
                   isSelected
                     ? "text-[var(--text-main)] font-semibold"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-main)] hover:bg-[var(--bg-hover,rgba(255,255,255,0.04))]"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-main)]"
                 }`}
               >
                 {/* 2. Framer Motion layout transition background */}
