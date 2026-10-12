@@ -230,8 +230,8 @@ const ChatBot = () => {
         <nav className="flex items-center justify-between rounded-xl px-3 py-2">
           <div className="flex gap-3 items-center">
             <img src="./logo.svg" className="h-8" alt="" />
-            <h1 className="text-2xl font-light tracking-tight font-heading">
-              Lens LM.
+            <h1 className="text-2xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
+              Lens L<span className="text-lg ">M</span> .
             </h1>
           </div>
           <div className="flex gap-1">

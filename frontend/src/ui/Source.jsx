@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { FileText, Plus, File, X, Upload, Coffee, Dot } from "lucide-react";
+import { FileText, Plus, File, X, Upload, Coffee, Dot, Logs } from "lucide-react";
 import EmptySource from "./EmptySource";
 import QrCode from "./QrCode";
 import PopupModal from "../components/PopupModal";
@@ -94,13 +94,25 @@ const Source = ({ chatId, onChatCreated }) => {
     return "./icons.svg";
   };
 
+  const handleColapse = () =>{
+    // Colapse Logic use framer motion for smooth open and close
+  }
+
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-2 h-full overflow-hidden bg-[var(--bg-main)]">
       {/* Sources Navbar */}
-      <nav className="flex items-center justify-between rounded-xl px-3 py-3 shrink-0">
-        <div className="flex items-center justify-between gap-2">
-          <img src="./icons.svg" className="w-6" alt="" />
-          <h2 className="text-xl font-light font-heading"> Sources</h2>
+      <nav className="flex items-center justify-between rounded-xl px-3 py-2 shrink-0">
+        <div className="flex items-center justify-between gap-4">
+          {/* <img src="./icons.svg" className="w-5" alt="" /> */}
+          <button 
+          onClick={handleColapse}
+          >
+            <Logs size={20} strokeWidth={1.8} />
+          </button>
+          <h2 className="text-xl font-light text-[var(--text-main)]/80 font-heading">
+            {" "}
+            Sources
+          </h2>
 
           {files.length > 0 && (
             <span className="rounded-md bg-[var(--bg-secondary)] px-2 py-0.5 text-xs text-[var(--text-secondary)]">

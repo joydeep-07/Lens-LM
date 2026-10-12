@@ -6,7 +6,6 @@ import Logo from "../components/Logo";
 const EmptySource = () => {
   return (
     <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
-      
       {/* Skeleton Preview */}
       <div className="relative mb-8 w-full max-w-74">
         {/* Floating File Icon */}
@@ -36,7 +35,7 @@ const EmptySource = () => {
           </div>
           {/* Bottom Skeleton */}
           <div className="mt-6 gap-2 border-t border-[var(--border-light)] pt-4">
-            <h2 className="text-xl font-heading text-center font-light tracking-wide">
+            <h2 className="text-xl font-light text-[var(--text-main)]/80 font-heading">
               Add your sources
             </h2>
           </div>

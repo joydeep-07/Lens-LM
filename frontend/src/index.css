@@ -99,13 +99,13 @@ button {
    FONT
 ========================= */
 @font-face {
-  font-family: "Genos";
-  src: url("./assets/fonts/genos.ttf") format("truetype");
+  font-family: "Marcellus";
+  src: url("./assets/fonts/Marcellus.ttf") format("truetype");
   font-display: swap;
 }
 
 .font-heading {
-  font-family: "Genos", sans-serif;
+  font-family: "Marcellus", sans-serif;
 }
 
 
