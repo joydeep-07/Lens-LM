@@ -151,15 +151,15 @@ const Auth = ({ className = "" }) => {
       className={`flex flex-col justify-between min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] ${className}`}
     >
       {/* NAVBAR */}
-      <nav className="w-full backdrop-blur-md sticky top-0 z-50 px-6 py-4">
-        <div className="w-full mx-auto grid grid-cols-[1fr_auto_1fr] items-center">
+      <nav className="w-full backdrop-blur-md sticky top-0 z-50 px-4 sm:px-6 py-4">
+        <div className="w-full mx-auto flex items-center justify-between gap-4">
           {/* LOGO AND TITLE */}
-          <div className="flex items-center gap-3 justify-start">
-            <div className="flex h-12 w-12 items-center justify-center">
+          <div className="flex items-center gap-1 md:gap-3 justify-start shrink-0">
+            <div className="flex h-12 w-12 items-center justify-center shrink-0">
               <img
                 src="/logo.svg"
                 alt="Logo"
-                className="w-9 h-9 object-contain"
+                className="md:w-9 w-7 md:h-9 h-7 object-contain"
               />
             </div>
 
@@ -167,39 +167,35 @@ const Auth = ({ className = "" }) => {
               <span className="font-heading text-xl font-light tracking-tight text-[var(--text-main)] block leading-none">
                 Lens LM
               </span>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-secondary)] font-medium">
-                Retrieval Augmented Generation Model
-              </span>
             </div>
           </div>
 
-          {/* NAVIGATION LINKS */}
-          <div className="hidden sm:flex items-center gap-6 text-xs text-[var(--text-secondary)] justify-center">
+          {/* CENTER: NAVIGATION LINKS (HIDDEN ON MOBILE) */}
+          <div className="hidden md:flex items-center justify-center gap-6 text-xs text-[var(--text-secondary)]">
             <a
               href="#docs"
-              className="hover:text-[var(--google-blue)] transition-colors"
+              className="hover:text-[var(--google-blue)] text-xs font-medium tracking-wider transition-colors"
             >
               Documentation
             </a>
 
             <a
               href="#support"
-              className="hover:text-[var(--google-blue)] transition-colors"
+              className="hover:text-[var(--google-blue)] text-xs font-medium tracking-wider transition-colors"
             >
               Support
             </a>
 
             <a
               href="#privacy"
-              className="hover:text-[var(--google-blue)] transition-colors"
+              className="hover:text-[var(--google-blue)] text-xs font-medium tracking-wider transition-colors"
             >
               Privacy
             </a>
           </div>
 
           {/* STATUS BADGE */}
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end shrink-0">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-light)] text-[10px] font-medium text-[var(--text-secondary)]">
               <span className="h-2 w-2 rounded-full bg-[var(--google-green)] animate-pulse" />
               <span>v2.4 Live</span>
@@ -209,14 +205,14 @@ const Auth = ({ className = "" }) => {
       </nav>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="relative w-full max-w-6xl min-h-[150px] overflow-hidden rounded-2xl border border-[var(--border-light)] border-t-[3px] border-t-[var(--google-blue)] bg-[var(--bg-main)] shadow-2xl backdrop-blur-xl">
-          <div className="grid md:grid-cols-[0.8fr_1.2fr]">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+        <div className="relative w-full max-w-6xl overflow-hidden rounded-2xl border border-[var(--border-light)] border-t-[3px] border-t-[var(--google-blue)] bg-[var(--bg-main)] shadow-2xl backdrop-blur-xl">
+          <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr]">
             {/* LEFT COLUMN */}
-            <div className="relative flex md:min-h-[500px] flex-col justify-between border-b border-[var(--border-light)] bg-[var(--bg-secondary)] p-7 sm:p-9 md:border-b-0 md:border-r">
+            <div className="relative flex flex-col justify-between border-b border-[var(--border-light)] bg-[var(--bg-secondary)] p-6 sm:p-9 md:border-b-0 md:border-r">
               <div>
-                <div className="mb-8 flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--bg-card)] text-[var(--google-blue)] shadow-sm">
+                <div className="mb-6 sm:mb-8 flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--bg-card)] text-[var(--google-blue)] shadow-sm shrink-0">
                     <ShieldCheck size={14} />
                   </span>
 
@@ -225,11 +221,11 @@ const Auth = ({ className = "" }) => {
                   </span>
                 </div>
 
-                <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-[var(--google-blue)] font-semibold">
+                <p className="mb-2 sm:mb-3 text-[10px] uppercase tracking-[0.3em] text-[var(--google-blue)] font-semibold">
                   01 / Account Access
                 </p>
 
-                <h2 className="text-[var(--text-main)] font-heading text-3xl md:text-4xl mb-4 tracking-tight">
+                <h2 className="text-[var(--text-main)] font-heading text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4 tracking-tight">
                   Lens LM.
                 </h2>
 
@@ -249,14 +245,17 @@ const Auth = ({ className = "" }) => {
                   <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)]">
                     <Sparkles
                       size={12}
-                      className="text-[var(--google-yellow)]"
+                      className="text-[var(--google-yellow)] shrink-0"
                     />
-                    <span>Fast & Secure</span>
+                    <span className="truncate">Fast & Secure</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)]">
-                    <Lock size={12} className="text-[var(--google-green)]" />
-                    <span>Encrypted</span>
+                    <Lock
+                      size={12}
+                      className="text-[var(--google-green)] shrink-0"
+                    />
+                    <span className="truncate">Encrypted</span>
                   </div>
                 </div>
               </div>
@@ -268,7 +267,7 @@ const Auth = ({ className = "" }) => {
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="p-7 sm:p-9 md:p-10 bg-[var(--bg-card)] flex flex-col justify-between">
+            <div className="p-6 sm:p-9 md:p-10 bg-[var(--bg-card)] flex flex-col justify-between">
               <div>
                 {/* FORM HEADER */}
                 <div className="mb-6">
@@ -279,7 +278,7 @@ const Auth = ({ className = "" }) => {
 
                     <ArrowUpRight
                       size={14}
-                      className="text-[var(--text-muted)]"
+                      className="text-[var(--text-muted)] shrink-0"
                     />
                   </div>
 
@@ -314,7 +313,7 @@ const Auth = ({ className = "" }) => {
                         <div className="group relative">
                           <Mail
                             size={14}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors duration-300 group-focus-within:text-[var(--google-blue)]"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors duration-300 group-focus-within:text-[var(--google-blue)] pointer-events-none"
                           />
 
                           <input
@@ -353,7 +352,7 @@ const Auth = ({ className = "" }) => {
                         {!loading && (
                           <ArrowUpRight
                             size={15}
-                            className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0"
                           />
                         )}
 
@@ -393,7 +392,7 @@ const Auth = ({ className = "" }) => {
                         <div className="group relative">
                           <KeyRound
                             size={14}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors duration-300 group-focus-within:text-[var(--google-blue)]"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition-colors duration-300 group-focus-within:text-[var(--google-blue)] pointer-events-none"
                           />
 
                           <input
@@ -436,7 +435,7 @@ const Auth = ({ className = "" }) => {
                         {!loading && (
                           <ArrowUpRight
                             size={15}
-                            className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0"
                           />
                         )}
 
@@ -492,7 +491,7 @@ const Auth = ({ className = "" }) => {
                 </div>
 
                 {/* SOCIAL LOGIN BUTTONS */}
-                <div className="grid grid-cols-4 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   {/* GOOGLE */}
                   <button
                     type="button"
@@ -581,17 +580,20 @@ const Auth = ({ className = "" }) => {
       </div>
 
       {/* FOOTER */}
-      <footer className="w-full py-6 px-6 text-xs text-[var(--text-secondary)]">
-        <div className="w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={14} className="text-[var(--google-green)]" />
+      <footer className="w-full py-6 px-4 sm:px-6 text-xs text-[var(--text-secondary)]">
+        <div className="w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-2">
+            <CheckCircle2
+              size={14}
+              className="text-[var(--google-green)] shrink-0"
+            />
 
             <span>
               © {new Date().getFullYear()} Lens LM Inc. All rights reserved.
             </span>
           </div>
 
-          <div className="flex items-center gap-6 text-[11px]">
+          <div className="flex items-center justify-center gap-4 sm:gap-6 text-[11px] flex-wrap">
             <a
               href="#terms"
               className="hover:text-[var(--google-blue)] transition-colors"
