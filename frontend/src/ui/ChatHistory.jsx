@@ -1,4 +1,3 @@
-// src/ui/ChatHistory.jsx (or appropriate path)
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -19,6 +18,7 @@ import SegmentedControl from "../components/SegmentedControl";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import RenderText from "../components/RenderText";
+import DeleteModal from "../components/DeleteModal"; 
 
 const ChatHistory = ({ onResumeChat }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +27,9 @@ const ChatHistory = ({ onResumeChat }) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [activeChatData, setActiveChatData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // State to manage the delete confirmation modal
+  const [chatToDelete, setChatToDelete] = useState(null);
 
   // Fetch all chats for the logged-in user on mount
   useEffect(() => {
@@ -91,16 +94,22 @@ const ChatHistory = ({ onResumeChat }) => {
     );
   };
 
-  // Delete chat
-  const deleteChat = async (id, e) => {
+  // Trigger modal open instead of immediate deletion
+  const promptDeleteChat = (id, e) => {
     e.stopPropagation();
+    setChatToDelete(id);
+  };
+
+  // Actual delete chat execution after confirmation
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
 
     try {
-      await api.delete(endpoints.deleteChat(id));
+      await api.delete(endpoints.deleteChat(chatToDelete));
       setChats((prevChats) => {
-        const remaining = prevChats.filter((chat) => chat.id !== id);
+        const remaining = prevChats.filter((chat) => chat.id !== chatToDelete);
 
-        if (selectedChat === id) {
+        if (selectedChat === chatToDelete) {
           setSelectedChat(remaining[0]?.id ?? null);
         }
 
@@ -108,6 +117,8 @@ const ChatHistory = ({ onResumeChat }) => {
       });
     } catch (error) {
       console.error("Failed to delete chat:", error);
+    } finally {
+      setChatToDelete(null);
     }
   };
 
@@ -171,7 +182,7 @@ const ChatHistory = ({ onResumeChat }) => {
   };
 
   return (
-    <div className="border border-[var(--border-light)]/50 flex overflow-hidden rounded-xl h-150 w-6xl bg-[var(--bg-main)] text-[var(--text-main)] shadow-2xl">
+    <div className="border border-[var(--border-light)]/50 flex overflow-hidden rounded-xl h-150 w-6xl bg-[var(--bg-main)] text-[var(--text-main)] shadow-2xl relative">
       {/* LEFT PANEL */}
       <aside className="w-80 shrink-0 border-r border-[var(--border-light)]/30 flex flex-col bg-[var(--bg-secondary)]/50 select-none min-h-0">
         {/* Header */}
@@ -275,7 +286,7 @@ const ChatHistory = ({ onResumeChat }) => {
                       </button>
 
                       <button
-                        onClick={(e) => deleteChat(chat.id, e)}
+                        onClick={(e) => promptDeleteChat(chat.id, e)}
                         title="Delete conversation"
                         aria-label="Delete conversation"
                         className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-[var(--bg-secondary)] transition-opacity"
@@ -463,6 +474,13 @@ const ChatHistory = ({ onResumeChat }) => {
           </div>
         )}
       </main>
+
+      {/* Delete Confirmation Modal Component */}
+      <DeleteModal
+        isOpen={Boolean(chatToDelete)}
+        onCancel={() => setChatToDelete(null)}
+        onConfirm={confirmDeleteChat}
+      />
     </div>
   );
 };
