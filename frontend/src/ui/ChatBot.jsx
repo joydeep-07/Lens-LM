@@ -84,7 +84,7 @@ const ChatBot = () => {
     if (!isDragging.current) return;
     const newWidth = (e.clientX / window.innerWidth) * 100;
 
-    if (newWidth >= 65 && newWidth <= 75) {
+    if (newWidth >= 40 && newWidth <= 75) {
       setLeftWidth(newWidth);
     }
   }, []);

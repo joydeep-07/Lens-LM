@@ -1,4 +1,5 @@
 import React from "react";
+import { easeInOut, motion } from "framer-motion";
 import GradientText from "../components/GradientText";
 
 const EmptyChat = () => {
@@ -19,8 +20,6 @@ const EmptyChat = () => {
 
   return (
     <div className="relative flex h-full flex-col justify-between overflow-hidden px-8 py-10">
-     
-
       {/* Greeting */}
       <div className="relative z-10">
         <GradientText
@@ -43,18 +42,21 @@ const EmptyChat = () => {
       {/* Suggestion Pills */}
       <div className="relative z-10 flex max-w-2xl flex-wrap items-center gap-2">
         {suggestions.map((item, idx) => (
-          <button
+          <motion.button
             key={idx}
+            layout
+            transition={{ duration: 0.3, ease: easeInOut }}
+            whileHover={{ scale: 1 }}
+            whileTap={{ scale: 0.99 }}
             className="
               flex w-fit max-w-full shrink-0 items-center
               rounded-full
-              border border-[var(--border-light)]
-              bg-[var(--bg-secondary)]
+              border border-[var(--border-light)]/50
+              bg-[var(--bg-secondary)]/50
               px-4 py-3
               text-left
-              transition-all duration-200
-              hover:bg-[var(--bg-card)]
-              active:scale-[0.99]
+              transition-colors duration-200
+              hover:bg-[var(--bg-card)]/50
             "
           >
             <span className="mr-2 text-xs font-semibold text-[var(--text-main)]">
@@ -64,7 +66,7 @@ const EmptyChat = () => {
             <span className="text-xs font-normal text-[var(--text-main)] opacity-50">
               {item.description}
             </span>
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
