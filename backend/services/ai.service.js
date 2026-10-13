@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { DEFAULT_SYSTEM_PROMPT } from "../config/prompts.js"; 
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -7,13 +8,19 @@ const groq = new Groq({
 export const getGroqChatCompletion = async (
   messages,
   modelName = "llama-3.3-70b-versatile",
+  systemPrompt = DEFAULT_SYSTEM_PROMPT, 
 ) => {
   try {
-    const response = await groq.chat.completions.create({
-      messages: messages.map((m) => ({
+    const formattedMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages.map((m) => ({
         role: m.role,
         content: m.content,
       })),
+    ];
+
+    const response = await groq.chat.completions.create({
+      messages: formattedMessages,
       model: modelName,
       temperature: 0.7,
       max_tokens: 2048,
