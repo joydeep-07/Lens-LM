@@ -47,33 +47,6 @@ const ChatBot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Fetch chat messages when currentChatId changes (resuming a chat)
-  useEffect(() => {
-    if (!currentChatId) return;
-
-    const fetchChatMessages = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get(endpoints.getChat(currentChatId));
-        const chat = response.data.chat;
-        if (chat && chat.messages) {
-          const formattedMessages = chat.messages.map((msg) => ({
-            sender: msg.role === "user" ? "user" : "bot",
-            text: msg.content,
-            role: msg.role,
-          }));
-          setMessages(formattedMessages);
-        }
-      } catch (error) {
-        console.error("Failed to load chat messages:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchChatMessages();
-  }, [currentChatId]);
-
   // Track completed questions based on user message count (capped at 10)
   const completedQuestions = Math.min(
     messages.filter((msg) => msg.sender === "user").length,
@@ -242,10 +215,28 @@ const ChatBot = () => {
     setMessage("");
   };
 
-  const handleResumeChat = (chatId) => {
+  // Fetch messages when choosing an existing chat from the Chat History
+  const handleResumeChat = async (chatId) => {
     setCurrentChatId(chatId);
-    // Dispatches a custom event to close any active modal popup cleanly
     window.dispatchEvent(new CustomEvent("close-popup-modal"));
+
+    try {
+      setIsLoading(true);
+      const response = await api.get(endpoints.getChat(chatId));
+      const chat = response.data.chat;
+      if (chat && chat.messages) {
+        const formattedMessages = chat.messages.map((msg) => ({
+          sender: msg.role === "user" ? "user" : "bot",
+          text: msg.content,
+          role: msg.role,
+        }));
+        setMessages(formattedMessages);
+      }
+    } catch (error) {
+      console.error("Failed to load chat messages:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -297,7 +288,7 @@ const ChatBot = () => {
                         }`}
                       >
                         <div
-                          className={`max-w-[85%] px-4 py-3 text-xs ${
+                          className={`max-w-[85%] px-4 py-2 text-xs ${
                             msg.sender === "user"
                               ? "bg-[var(--bg-secondary)] text-justify rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)]/90 leading-relaxed border border-[var(--border-light)]"
                               : "text-[var(--text-main)] w-full text-[var(--text-main)]/90 leading-relaxed"
