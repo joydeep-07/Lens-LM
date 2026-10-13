@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { WifiIcon, WifiLow, WifiOff, X } from "lucide-react";
 import gsap from "gsap";
@@ -113,9 +112,17 @@ export default function Wifi() {
         className="rounded-lg p-2 text-[var(--text-secondary)] hover:text-[var(--text-main)] transition-colors hover:bg-[var(--bg-secondary)]"
       >
         {isOffline ? (
-          <WifiOff size={19} strokeWidth={1.8} />
+          <WifiOff
+            size={19}
+            strokeWidth={1.8}
+            className="text-[var(--google-red)]  "
+          />
         ) : isSlow ? (
-          <WifiLow size={19} strokeWidth={1.8} />
+          <WifiLow
+            size={19}
+            strokeWidth={1.8}
+            className="text-[var(--google-yellow)] "
+          />
         ) : (
           <WifiIcon size={19} strokeWidth={1.8} />
         )}
@@ -223,4 +230,3 @@ export default function Wifi() {
     </>
   );
 }
-
