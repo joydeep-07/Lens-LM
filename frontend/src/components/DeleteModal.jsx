@@ -61,7 +61,7 @@ export default function DeleteModal({ isOpen, onCancel, onConfirm }) {
         onClick={(e) => e.stopPropagation()}
         className="flex flex-col items-center bg-[var(--bg-main)] shadow-md rounded-sm py-6 px-5 md:w-[460px] w-[370px] border border-[var(--border-light)]/40"
       >
-        <div className="flex items-center justify-center p-4 bg-red-500/10 border border-red-500/20 rounded-full">
+        <div className="flex items-center justify-center p-4 bg-[var(--bg-secondary)]/50 border border-[var(--border-light)]/40 rounded-full">
           <Trash2 className="text-red-500" size={21} />
         </div>
 
