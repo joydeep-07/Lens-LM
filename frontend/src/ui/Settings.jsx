@@ -21,13 +21,14 @@ import {
 } from "lucide-react";
 
 import GeneralSettings from "../settings/General";
+import ProfileSettings from "../settings/ProfileSettings";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("general");
 
   const tabs = [
     { id: "general", label: "General", icon: SettingsIcon },
-    // { id: "account", label: "Account", icon: User },
+    { id: "account", label: "Account", icon: User },
     { id: "privacy", label: "Privacy", icon: Shield },
     // { id: "billing", label: "Billing", icon: CreditCard },
     { id: "capabilities", label: "Capabilities", icon: Cpu },
@@ -61,7 +62,7 @@ const Settings = () => {
   // Map active tab keys directly to components
   const TAB_COMPONENTS = {
     general: <GeneralSettings />,
-    // account: <AccountSettings />,
+    account: <ProfileSettings />,
     // billing: <BillingSettings />,
     // privacy: <PrivacySettings />,
   };
