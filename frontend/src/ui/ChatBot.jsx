@@ -28,6 +28,9 @@ const ChatBot = () => {
   const [copied, setCopied] = useState(false);
   const [selectedVoiceUri, setSelectedVoiceUri] = useState("");
 
+  // Shared files state between ChatBot and Source panel
+  const [files, setFiles] = useState([]);
+
   // Speech synthesis state
   const [speakingIndex, setSpeakingIndex] = useState(null);
 
@@ -213,9 +216,10 @@ const ChatBot = () => {
     setCurrentChatId(null);
     setMessages([]);
     setMessage("");
+    setFiles([]);
   };
 
-  // Fetch messages when choosing an existing chat from the Chat History
+  // Fetch messages and files when choosing an existing chat from the Chat History
   const handleResumeChat = async (chatId) => {
     setCurrentChatId(chatId);
     window.dispatchEvent(new CustomEvent("close-popup-modal"));
@@ -224,16 +228,21 @@ const ChatBot = () => {
       setIsLoading(true);
       const response = await api.get(endpoints.getChat(chatId));
       const chat = response.data.chat;
-      if (chat && chat.messages) {
-        const formattedMessages = chat.messages.map((msg) => ({
-          sender: msg.role === "user" ? "user" : "bot",
-          text: msg.content,
-          role: msg.role,
-        }));
-        setMessages(formattedMessages);
+      if (chat) {
+        if (chat.messages) {
+          const formattedMessages = chat.messages.map((msg) => ({
+            sender: msg.role === "user" ? "user" : "bot",
+            text: msg.content,
+            role: msg.role,
+          }));
+          setMessages(formattedMessages);
+        }
+        if (chat.files) {
+          setFiles(chat.files);
+        }
       }
     } catch (error) {
-      console.error("Failed to load chat messages:", error);
+      console.error("Failed to load chat data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -375,6 +384,10 @@ const ChatBot = () => {
               models={models}
               levels={levels}
               completedQuestions={completedQuestions}
+              onOpenUpload={() => {
+                // Allows attachment icon button to trigger the Source file browser if needed
+                document.getElementById("source-file-input")?.click();
+              }}
             />
           </div>
         </div>
@@ -394,6 +407,8 @@ const ChatBot = () => {
         <Source
           chatId={currentChatId}
           onChatCreated={(newId) => setCurrentChatId(newId)}
+          files={files}
+          setFiles={setFiles}
         />
       </div>
     </div>

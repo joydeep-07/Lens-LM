@@ -4,6 +4,11 @@ import path from "path";
 import fs from "fs/promises";
 import { fileTypeFromBuffer } from "file-type";
 import { getGroqChatCompletion } from "../services/ai.service.js";
+import {
+  indexChatFile,
+  getRagAnswer,
+  deleteChatChunks,
+} from "../services/rag.service.js";
 
 import Chat from "../models/chat.model.js";
 
@@ -263,6 +268,9 @@ export const deleteChat = async (req, res) => {
       }),
     );
 
+    // Remove all RAG chunks for this chat from the DocumentChunk collection.
+    await deleteChatChunks(chat._id);
+
     await chat.deleteOne();
 
     return res.status(200).json({
@@ -367,6 +375,31 @@ export const uploadChatFiles = async (req, res) => {
 
     chat.files.push(...detectedFiles);
     await chat.save();
+
+    // Kick off RAG indexing for each newly added file.
+    // This runs in the background — the HTTP response is returned immediately
+    // while indexing proceeds. The file's processingStatus is updated in the DB.
+    const newFileIds = new Set(
+      chat.files.slice(-detectedFiles.length).map((f) => String(f._id)),
+    );
+
+    // Re-fetch with storagePath (select: false field) so indexChatFile can read disk.
+    Chat.findOne({ _id: chat._id, user: req.user._id })
+      .select("+files.storagePath")
+      .then((chatWithPaths) => {
+        if (!chatWithPaths) return;
+        const filesToIndex = chatWithPaths.files.filter((f) =>
+          newFileIds.has(String(f._id)),
+        );
+        for (const file of filesToIndex) {
+          indexChatFile(chatWithPaths, file).catch((err) =>
+            console.error("[RAG] Background indexing error:", err.message),
+          );
+        }
+      })
+      .catch((err) =>
+        console.error("[RAG] Failed to fetch chat for indexing:", err.message),
+      );
 
     return res.status(201).json({
       success: true,
@@ -505,11 +538,6 @@ export const sendChatMessage = async (req, res) => {
       content: message.trim(),
     });
 
-    // 2. Map existing chat history for Groq context format
-    const formattedHistory = chat.messages.map((msg) => ({
-      role: msg.role,
-      content: msg.content,
-    }));
 
     // Map frontend dropdown model names to actual Groq model IDs
     const modelMap = {
@@ -519,9 +547,10 @@ export const sendChatMessage = async (req, res) => {
     };
     const selectedGroqModel = modelMap[model] || "openai/gpt-oss-20b";
 
-    // 3. Get response from Groq
-    const aiResponseText = await getGroqChatCompletion(
-      formattedHistory,
+    // 3. Get response via RAG pipeline (falls back to plain Groq if no docs)
+    const aiResponseText = await getRagAnswer(
+      chat,
+      message.trim(),
       selectedGroqModel,
     );
 

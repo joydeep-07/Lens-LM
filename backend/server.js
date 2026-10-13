@@ -10,6 +10,7 @@ import multer from "multer";
 
 import authRoutes from "./routes/auth.route.js";
 import chatRoutes from "./routes/chat.route.js";
+import { warmUpEmbeddingModel } from "./services/rag.service.js";
 
 const app = express();
 
@@ -260,6 +261,10 @@ const startServer = async () => {
     });
 
     console.log("MongoDB connected successfully.");
+
+    // Pre-load the embedding model in the background so it's ready
+    // before the first file upload arrives (avoids a 30-second delay).
+    warmUpEmbeddingModel();
 
     const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

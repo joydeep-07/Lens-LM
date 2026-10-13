@@ -1,15 +1,15 @@
+// src/ui/Source.jsx
 import React, { useRef, useState } from "react";
-import { FileText, Plus, File, X, Upload, Coffee, Dot, Logs } from "lucide-react";
+import { FileText, Plus, File, X, Upload, Coffee, Logs } from "lucide-react";
 import EmptySource from "./EmptySource";
 import QrCode from "./QrCode";
 import PopupModal from "../components/PopupModal";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
 
-const Source = ({ chatId, onChatCreated }) => {
+const Source = ({ chatId, onChatCreated, files, setFiles }) => {
   const fileInputRef = useRef(null);
 
-  const [files, setFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -34,7 +34,7 @@ const Source = ({ chatId, onChatCreated }) => {
 
       const formData = new FormData();
       newFilesArray.forEach((file) => {
-        formData.append("files", file); // Must match backend multer field name ('files')
+        formData.append("files", file); // Matches backend multer field name ('files')
       });
 
       const response = await api.post(
@@ -80,7 +80,7 @@ const Source = ({ chatId, onChatCreated }) => {
     }
   };
 
-  // Helper function to determine which icon to show based on file extension
+  // Helper function to determine icon based on file extension
   const getFileIcon = (fileName) => {
     if (!fileName) return "./icons.svg";
     const extension = fileName.split(".").pop().toLowerCase();
@@ -91,27 +91,23 @@ const Source = ({ chatId, onChatCreated }) => {
     if (["jpg", "png", "jpeg"].includes(extension)) return "./image.svg";
     if (["js", "jsx", "py", "html", "css"].includes(extension))
       return "./code.svg";
-   
+
     return "./icons.svg";
   };
 
-  const handleColapse = () =>{
-    // Colapse Logic use framer motion for smooth open and close
-  }
+  const handleCollapse = () => {
+    // Collapse / Expand logic handler
+  };
 
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-2 h-full overflow-hidden bg-[var(--bg-main)]">
       {/* Sources Navbar */}
       <nav className="flex items-center justify-between rounded-xl px-3 py-2 shrink-0">
         <div className="flex items-center justify-between gap-4">
-          {/* <img src="./icons.svg" className="w-5" alt="" /> */}
-          <button 
-          onClick={handleColapse}
-          >
+          <button onClick={handleCollapse}>
             <Logs size={20} strokeWidth={1.8} />
           </button>
           <h2 className="text-xl font-light text-[var(--text-main)]/80 font-heading">
-            {" "}
             Sources
           </h2>
 
@@ -133,6 +129,7 @@ const Source = ({ chatId, onChatCreated }) => {
 
       {/* Hidden File Input */}
       <input
+        id="source-file-input"
         ref={fileInputRef}
         type="file"
         multiple
@@ -161,7 +158,7 @@ const Source = ({ chatId, onChatCreated }) => {
                   onClick={() => setFiles([])}
                   className="text-xs text-[var(--text-muted)] transition-colors hover:text-[var(--text-main)]"
                 >
-                  Clear all
+                  Clear list
                 </button>
               </div>
 
