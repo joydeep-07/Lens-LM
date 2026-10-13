@@ -24,6 +24,7 @@ import endpoints from "../api/endpoints";
 import { updateUser } from "../redux/authSlice";
 import SegmentedControl from "../components/SegmentedControl";
 import ToggleSwitch from "../components/ToggleSwitch";
+import Skeleton from "../components/Skeleton";
 
 // Generate a default name and username from the email address.
 const getDefaultProfile = (email) => {
@@ -350,10 +351,7 @@ const ProfileSettings = () => {
             )}
 
             {loading ? (
-              <div className="flex items-center justify-center gap-2 py-16 text-sm text-[var(--text-secondary)]">
-                <LoaderCircle size={18} className="animate-spin" />
-                Loading your profile...
-              </div>
+              <Skeleton variant="profileSettings" />
             ) : (
               <>
                 {/* Basic Information */}
