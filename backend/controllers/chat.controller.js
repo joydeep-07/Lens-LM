@@ -39,6 +39,7 @@ const ALLOWED_EXTENSIONS = new Set([
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
   "text/plain",
+  "application/octet-stream", 
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "text/markdown",
