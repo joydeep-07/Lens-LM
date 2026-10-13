@@ -1,3 +1,4 @@
+// src/ui/ChatHistory.jsx (or appropriate path)
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -6,7 +7,6 @@ import {
   Pin,
   Trash2,
   Clock,
-  ArrowRight,
   Share2,
   Copy,
   RotateCw,
@@ -20,7 +20,7 @@ import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import RenderText from "../components/RenderText";
 
-const ChatHistory = () => {
+const ChatHistory = ({ onResumeChat }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("All");
   const [chats, setChats] = useState([]);
@@ -230,7 +230,6 @@ const ChatHistory = () => {
                       : "text-[var(--text-secondary)] hover:text-[var(--text-main)]"
                   }`}
                 >
-                  {/* Selected Background */}
                   {isSelected && (
                     <motion.div
                       layoutId="activeChatSlideIndicator"
@@ -243,7 +242,6 @@ const ChatHistory = () => {
                     />
                   )}
 
-                  {/* Title and Actions */}
                   <div className="relative z-10 flex items-center justify-between">
                     <span className="text-xs truncate font-medium text-[var(--text-main)] pr-2">
                       {chat.title}
@@ -290,12 +288,10 @@ const ChatHistory = () => {
                     </div>
                   </div>
 
-                  {/* First User Message */}
                   <p className="relative z-10 text-[11px] truncate text-[var(--text-muted)]">
                     {firstUserMessage}
                   </p>
 
-                  {/* Date and Message Count */}
                   <div className="relative z-10 flex items-center justify-between pt-1 text-[10px] text-[var(--text-muted)]">
                     <span className="flex items-center gap-1">
                       <Clock size={10} />
@@ -326,7 +322,7 @@ const ChatHistory = () => {
               </div>
             </header>
 
-            {/* ATTACHED DOCUMENTS / SOURCES BAR (Displayed on top of chat) */}
+            {/* ATTACHED DOCUMENTS / SOURCES BAR */}
             {activeChatData.files && activeChatData.files.length > 0 && (
               <div className="shrink-0 px-6 py-2.5 bg-[var(--bg-secondary)]/30 border-b border-[var(--border-light)]/30 flex items-center gap-2 overflow-x-auto">
                 <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider shrink-0">
@@ -388,7 +384,6 @@ const ChatHistory = () => {
                       >
                         <RenderText text={message.content} />
 
-                        {/* Action Icons Below Bot Reply */}
                         {!isUser && (
                           <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
                             <button
@@ -436,7 +431,9 @@ const ChatHistory = () => {
 
               <button
                 onClick={() => {
-                  console.log("Resume chat:", activeChatData.id);
+                  if (activeChatData && typeof onResumeChat === "function") {
+                    onResumeChat(activeChatData.id);
+                  }
                 }}
                 className="flex shrink-0 text-white tracking-wider items-center gap-2 px-4 py-2 rounded-xs text-xs font-medium shadow-md transition-colors hover:opacity-90"
                 style={{
@@ -449,7 +446,6 @@ const ChatHistory = () => {
             </footer>
           </>
         ) : (
-          /* Empty State */
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-2">
             <MessageSquare
               size={28}

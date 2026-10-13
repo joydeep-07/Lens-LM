@@ -1,16 +1,10 @@
+// src/ui/SidePanel.jsx
 import React from "react";
 import {
   MessageSquare,
-  Star,
   User,
   Settings,
-  CircleFadingPlus,
-  HistoryIcon,
-  File,
-  Layout,
   LayoutDashboard,
-  ChartBar,
-  Speaker,
   Volume2,
 } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
@@ -23,7 +17,12 @@ import NewChatButton from "./NewChatButton";
 import Files from "./Files";
 import VoiceSelector from "./VoiceSelector";
 
-const SidePanel = ({ onNewChat, selectedVoiceUri, setSelectedVoiceUri }) => {
+const SidePanel = ({
+  onNewChat,
+  selectedVoiceUri,
+  setSelectedVoiceUri,
+  onResumeChat,
+}) => {
   return (
     <div className="w-12 h-full flex flex-col justify-between items-center py-4">
       {/* Top Section: New Chat & Main Navigation */}
@@ -40,7 +39,7 @@ const SidePanel = ({ onNewChat, selectedVoiceUri, setSelectedVoiceUri }) => {
             title="Chat History"
             ariaLabel="Chat History"
           >
-            <ChatHistory />
+            <ChatHistory onResumeChat={onResumeChat} />
           </PopupModal>
 
           <PopupModal
@@ -69,12 +68,10 @@ const SidePanel = ({ onNewChat, selectedVoiceUri, setSelectedVoiceUri }) => {
       <div className="flex flex-col items-center gap-2 w-full px-2">
         <ThemeToggle />
 
-        {/* Reusable Popup for Settings */}
         <PopupModal icon={Settings} title="Settings" ariaLabel="Settings">
           <Settings69 />
         </PopupModal>
 
-        {/* Reusable Popup for Profile */}
         <PopupModal icon={User} title="Profile" ariaLabel="Profile">
           <Profile />
         </PopupModal>

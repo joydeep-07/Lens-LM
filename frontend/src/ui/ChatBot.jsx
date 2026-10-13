@@ -1,3 +1,4 @@
+// src/ui/ChatBot.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   CircleFadingPlus,
@@ -18,7 +19,6 @@ import SidePanel from "./SidePanel";
 import ChatInput from "./ChatInput";
 import NewChatButton from "./NewChatButton";
 import Wifi from "./Wifi";
-import VoiceSelector from "./VoiceSelector";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -46,6 +46,33 @@ const ChatBot = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
+
+  // Fetch chat messages when currentChatId changes (resuming a chat)
+  useEffect(() => {
+    if (!currentChatId) return;
+
+    const fetchChatMessages = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(endpoints.getChat(currentChatId));
+        const chat = response.data.chat;
+        if (chat && chat.messages) {
+          const formattedMessages = chat.messages.map((msg) => ({
+            sender: msg.role === "user" ? "user" : "bot",
+            text: msg.content,
+            role: msg.role,
+          }));
+          setMessages(formattedMessages);
+        }
+      } catch (error) {
+        console.error("Failed to load chat messages:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchChatMessages();
+  }, [currentChatId]);
 
   // Track completed questions based on user message count (capped at 10)
   const completedQuestions = Math.min(
@@ -162,7 +189,6 @@ const ChatBot = () => {
   const handleRegenerate = async () => {
     if (isLoading || messages.length === 0) return;
 
-    // Find the last user message
     const lastUserMsgIndex = [...messages]
       .reverse()
       .findIndex((m) => m.sender === "user");
@@ -171,10 +197,7 @@ const ChatBot = () => {
     const actualIndex = messages.length - 1 - lastUserMsgIndex;
     const lastUserText = messages[actualIndex].text;
 
-    // Remove messages from the last user prompt onward
     setMessages((prev) => prev.slice(0, actualIndex));
-
-    // Resend
     await handleSend(lastUserText);
   };
 
@@ -201,7 +224,7 @@ const ChatBot = () => {
       utterance.voice = chosenVoice;
     }
 
-    utterance.pitch = 0.95; // Fine-tune pitch
+    utterance.pitch = 0.95;
     utterance.rate = 1.0;
 
     utterance.onend = () => setSpeakingIndex(null);
@@ -217,6 +240,12 @@ const ChatBot = () => {
     setCurrentChatId(null);
     setMessages([]);
     setMessage("");
+  };
+
+  const handleResumeChat = (chatId) => {
+    setCurrentChatId(chatId);
+    // Dispatches a custom event to close any active modal popup cleanly
+    window.dispatchEvent(new CustomEvent("close-popup-modal"));
   };
 
   return (
@@ -242,16 +271,15 @@ const ChatBot = () => {
 
         <div className="flex h-full gap-2 w-full overflow-hidden">
           {/* Side Navigation Panel */}
-          {/* Side Navigation Panel */}
           <SidePanel
             onNewChat={handleNewChat}
             selectedVoiceUri={selectedVoiceUri}
             setSelectedVoiceUri={setSelectedVoiceUri}
+            onResumeChat={handleResumeChat}
           />
 
           {/* Main Chat Area */}
           <div className="relative flex flex-1 flex-col h-full overflow-hidden">
-            {/* Chat Messages / Empty State Area */}
             <div className="flex-1 overflow-y-auto pb-4 px-2 z-10 space-y-4">
               {messages.length === 0 ? (
                 <EmptyChat />
@@ -277,7 +305,6 @@ const ChatBot = () => {
                         >
                           <RenderText text={msg.text} />
 
-                          {/* Action Icons Below Bot Reply */}
                           {msg.sender === "bot" && (
                             <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
                               <button
@@ -285,7 +312,6 @@ const ChatBot = () => {
                                 className="transition-colors hover:text-[var(--text-main)]"
                                 title={copied ? "Copied!" : "Copy"}
                               >
-                                {" "}
                                 {copied ? (
                                   <Check
                                     size={15}
@@ -294,7 +320,7 @@ const ChatBot = () => {
                                   />
                                 ) : (
                                   <Copy size={15} strokeWidth={1.8} />
-                                )}{" "}
+                                )}
                               </button>
                               <button
                                 onClick={handleRegenerate}
@@ -325,7 +351,6 @@ const ChatBot = () => {
                     ))}
                   </AnimatePresence>
 
-                  {/* Skeleton Loader */}
                   {isLoading && (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -343,7 +368,6 @@ const ChatBot = () => {
               )}
             </div>
 
-            {/* Message Input Container Component */}
             <ChatInput
               message={message}
               setMessage={setMessage}

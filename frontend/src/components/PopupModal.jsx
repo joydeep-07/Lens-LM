@@ -1,3 +1,4 @@
+// src/components/PopupModal.jsx
 import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 
@@ -12,42 +13,58 @@ const PopupModal = ({
   const modalRef = useRef(null);
   const backdropRef = useRef(null);
 
+  const closeModal = () => {
+    if (!isOpen) return;
+    setIsOpen(false);
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setShowModal(false);
+      },
+    });
+
+    tl.to(modalRef.current, {
+      opacity: 0,
+      scale: 0.97,
+      y: 4,
+      duration: 0.2,
+      ease: "power2.in",
+    }).to(
+      backdropRef.current,
+      {
+        opacity: 0,
+        duration: 0.15,
+        ease: "power1.in",
+      },
+      "-=0.15",
+    );
+  };
+
   const toggleModal = () => {
     if (isOpen) {
-      // Trigger close animation
-      setIsOpen(false);
-
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setShowModal(false); // Unmount after animation finishes
-        },
-      });
-
-      tl.to(modalRef.current, {
-        opacity: 0,
-        scale: 0.97,
-        y: 4,
-        duration: 0.2,
-        ease: "power2.in",
-      }).to(
-        backdropRef.current,
-        {
-          opacity: 0,
-          duration: 0.15,
-          ease: "power1.in",
-        },
-        "-=0.15", // Overlap slightly for a smoother fade out
-      );
+      closeModal();
     } else {
-      // Open modal and trigger entrance animation
       setShowModal(true);
       setIsOpen(true);
     }
   };
 
+  // Listen for external close modal events 
+  useEffect(() => {
+    const handleExternalClose = () => {
+      if (isOpen) {
+        closeModal();
+      }
+    };
+
+    window.addEventListener("close-popup-modal", handleExternalClose);
+    return () => {
+      window.removeEventListener("close-popup-modal", handleExternalClose);
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (isOpen) {
-      // Subtle minimal entrance animation
       gsap.fromTo(
         backdropRef.current,
         { opacity: 0 },
@@ -80,9 +97,8 @@ const PopupModal = ({
           ref={backdropRef}
           onClick={toggleModal}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
-          style={{ opacity: 0 }} // Start at 0 to avoid a flash before GSAP kicks in
+          style={{ opacity: 0 }}
         >
-          {/* Stop propagation so clicking inside the modal doesn't close it */}
           <div ref={modalRef} onClick={(e) => e.stopPropagation()}>
             {children}
           </div>
