@@ -358,7 +358,23 @@ const ChatBot = () => {
                       animate={{ opacity: 1 }}
                       className="flex flex-col items-start"
                     >
-                    <ThoughtLine/>
+                      <ThoughtLine
+                        steps={[
+                          "Reading the question",
+                          "Searching your notes",
+                          "Drafting an answer",
+                        ]}
+                        label="Thinking…"
+                        doneLabel="Thought for"
+                        fontSize={10}
+                        breathPeriod={1.6}
+                        breathDepth={0.5}
+                        settleDuration={350}
+                        settleBlur={2}
+                        collapsible
+                        collapseOnSettle
+                        showTimer
+                      />
                     </motion.div>
                   )}
                   <div ref={messagesEndRef} />

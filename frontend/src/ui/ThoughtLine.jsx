@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, useReducedMotion } from "motion/react";
-import { ChevronDown, Sparkles, Check } from "lucide-react";
+import { ChevronDown, Sparkles, Check, Loader } from "lucide-react";
 
 const EASE_OUT = [0.23, 1, 0.32, 1];
 const EASE_IN_OUT = [0.77, 0, 0.175, 1];
@@ -209,7 +209,7 @@ export default function ThoughtLine({
           aria-hidden="true"
         >
           {glyph === "sparkle" ? (
-            <Sparkles size="100%" strokeWidth={2} />
+            <Loader size={10} strokeWidth={2} />
           ) : glyph === "dot" ? (
             <span className="m-auto h-[0.5em] w-[0.5em] rounded-full bg-[var(--accent-primary)]" />
           ) : (
