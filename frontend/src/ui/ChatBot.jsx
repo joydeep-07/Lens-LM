@@ -19,6 +19,7 @@ import SidePanel from "./SidePanel";
 import ChatInput from "./ChatInput";
 import NewChatButton from "./NewChatButton";
 import Wifi from "./Wifi";
+import ThoughtLine from "./ThoughtLine";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -260,7 +261,7 @@ const ChatBot = () => {
           <div className="flex gap-3 items-center">
             <img src="./logo.svg" className="h-8" alt="" />
             <h1 className="text-2xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
-              Lens L<span className="text-lg ">M</span> .
+              Lens L<span className="text-lg ">M</span>.
             </h1>
           </div>
           <div className="flex gap-1">
@@ -357,10 +358,7 @@ const ChatBot = () => {
                       animate={{ opacity: 1 }}
                       className="flex flex-col items-start"
                     >
-                      <div className="max-w-[80%] px-4 py-3 text-sm w-full space-y-2">
-                        <div className="h-2.5 w-32 animate-pulse rounded-full bg-[var(--border-light)]" />
-                        <div className="h-2 w-24 animate-pulse rounded-full bg-[var(--bg-secondary)]" />
-                      </div>
+                    <ThoughtLine/>
                     </motion.div>
                   )}
                   <div ref={messagesEndRef} />

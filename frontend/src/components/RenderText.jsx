@@ -8,7 +8,10 @@ const RenderText = ({ text }) => {
   if (!text) return null;
 
   // Clean up HTML break tags and replace with newlines
-  const sanitized = text.replace(/<br\s*[\/]?>/gi, "\n");
+const sanitized = text
+  .replace(/<br\s*\/?>/gi, "\n")
+  .replace(/\u00A0/g, " ")
+  .replace(/\r\n?/g, "\n");
 
   // Split text into chunks: code blocks vs regular text blocks
   const parts = sanitized.split(/(```[\s\S]*?```)/g);
@@ -42,9 +45,11 @@ const RenderText = ({ text }) => {
 /* ------------------------------------------------------------------
 Helper: render a single text block (anything not in fenced code)
 ------------------------------------------------------------------- */
+
 const renderTextBlock = (block, key) => {
   const lines = block.split("\n");
   const elements = [];
+
   let listOpen = false;
   let listType = null;
   let listItems = [];
@@ -52,27 +57,35 @@ const renderTextBlock = (block, key) => {
   const flushList = () => {
     if (listOpen && listItems.length) {
       const ListTag = listType === "ol" ? "ol" : "ul";
+
       const listClass =
         listType === "ol" ? "ml-4 list-decimal" : "ml-4 list-disc";
+
       elements.push(
-        <ListTag key={`list-${key}-${elements.length}`} className={listClass}>
+        <ListTag
+          key={`list-${key}-${elements.length}`}
+          className={listClass}
+        >
           {listItems}
         </ListTag>,
       );
     }
+
     listOpen = false;
     listType = null;
     listItems = [];
   };
 
   let idx = 0;
+
   while (idx < lines.length) {
     const raw = lines[idx];
     const line = raw.trim();
 
-    /* 1️⃣ Blockquote */
+    /* 1. Blockquote */
     if (line.startsWith(">")) {
       flushList();
+
       elements.push(
         <blockquote
           key={`bq-${key}-${idx}`}
@@ -81,35 +94,61 @@ const renderTextBlock = (block, key) => {
           {renderInlineMarkdown(line.slice(1).trim())}
         </blockquote>,
       );
+
       idx++;
       continue;
     }
 
-    /* 2️⃣ Heading */
+    /* 2. Horizontal Divider: --- */
+    if (/^---+$/.test(line)) {
+      flushList();
+
+      elements.push(
+        <hr
+          key={`hr-${key}-${idx}`}
+          className="my-3 border-0 border-t border-[var(--border-light,#e5e7eb)]/30"
+        />,
+      );
+
+      idx++;
+      continue;
+    }
+
+    /* 3. Heading */
     const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+
     if (headingMatch) {
       flushList();
+
       const level = headingMatch[1].length;
       const Tag = `h${level}`;
+
       const sizeClass =
         level === 1
           ? "text-2xl font-bold my-2"
           : level === 2
             ? "text-xl font-semibold my-2"
             : "text-lg font-medium my-1";
+
       elements.push(
-        <Tag key={`h${level}-${key}-${idx}`} className={sizeClass}>
+        <Tag
+          key={`h${level}-${key}-${idx}`}
+          className={sizeClass}
+        >
           {renderInlineMarkdown(headingMatch[2].trim())}
         </Tag>,
       );
+
       idx++;
       continue;
     }
 
-    /* 3️⃣ Table (Group consecutive table lines together) */
+    /* 4. Table */
     if (line.startsWith("|") && line.endsWith("|")) {
       flushList();
+
       const tableLines = [];
+
       while (
         idx < lines.length &&
         lines[idx].trim().startsWith("|") &&
@@ -123,13 +162,20 @@ const renderTextBlock = (block, key) => {
       let isHeaderGroup = true;
 
       tableLines.forEach((tableLine, tIdx) => {
+        // Remove the outer pipes and split only on unescaped pipes.
         const cells = tableLine
-          .split("|")
-          .filter((c) => c.trim() !== "")
-          .map((c) => c.trim());
+          .replace(/^\|/, "")
+          .replace(/\|$/, "")
+          .split(/(?<!\\)\|/)
+          .map((cell) =>
+            cell
+              .replace(/\\\|/g, "|")
+              .replace(/\u00A0/g, " ")
+              .trim(),
+          );
 
-        // Skip separator row (e.g. |---|---|)
-        if (cells.every((c) => /^[-:]+$/.test(c))) {
+        // Skip Markdown separator rows such as |---|---|.
+        if (cells.every((cell) => /^[-:\s]+$/.test(cell))) {
           isHeaderGroup = false;
           return;
         }
@@ -145,7 +191,7 @@ const renderTextBlock = (block, key) => {
             {cells.map((cell, cIdx) => (
               <CellTag
                 key={`cell-${key}-${tIdx}-${cIdx}`}
-                className={`px-4 py-2.5 text-left ${
+                className={`px-4 py-2.5 text-left align-top ${
                   isHeader
                     ? "font-semibold bg-[var(--bg-secondary,#f3f4f6)]/30 text-[var(--text-main,#111)]"
                     : "text-[var(--text-main,#111)]"
@@ -160,23 +206,29 @@ const renderTextBlock = (block, key) => {
 
       if (tableRows.length > 0) {
         elements.push(
-          <table
-            key={`table-${key}-${idx}`}
-            className="w-full border-collapse border border-[var(--border-light,#e5e7eb)]/20 rounded-sm overflow-hidden my-3 text-xs"
+          <div
+            key={`table-wrapper-${key}-${idx}`}
+            className="w-full overflow-x-auto my-3"
           >
-            <tbody>{tableRows}</tbody>
-          </table>,
+            <table className="w-full border-collapse border border-[var(--border-light,#e5e7eb)]/20 rounded-sm text-xs">
+              <tbody>{tableRows}</tbody>
+            </table>
+          </div>,
         );
       }
+
       continue;
     }
 
-    /* 4️⃣ List items */
+    /* 5. List Items */
     const unorderedMatch = line.match(/^(\s*)([-*+])\s+(.*)$/);
     const orderedMatch = line.match(/^(\s*)(\d+)\.\s+(.*)$/);
 
     if (unorderedMatch || orderedMatch) {
-      const content = unorderedMatch ? unorderedMatch[3] : orderedMatch[3];
+      const content = unorderedMatch
+        ? unorderedMatch[3]
+        : orderedMatch[3];
+
       const type = unorderedMatch ? "ul" : "ol";
 
       if (!listOpen || listType !== type) {
@@ -186,17 +238,22 @@ const renderTextBlock = (block, key) => {
       }
 
       listItems.push(
-        <li key={`li-${key}-${idx}`} className="list-item mb-1 leading-relaxed">
+        <li
+          key={`li-${key}-${idx}`}
+          className="list-item mb-1 leading-relaxed"
+        >
           {renderInlineMarkdown(content.trim())}
         </li>,
       );
+
       idx++;
       continue;
     }
 
-    /* 5️⃣ Plain paragraph */
+    /* 6. Plain Paragraph */
     if (line !== "") {
       flushList();
+
       elements.push(
         <p
           key={`p-${key}-${idx}`}
@@ -206,10 +263,12 @@ const renderTextBlock = (block, key) => {
         </p>,
       );
     }
+
     idx++;
   }
 
   flushList();
+
   return (
     <div key={key} className="space-y-1">
       {elements}
@@ -217,43 +276,49 @@ const renderTextBlock = (block, key) => {
   );
 };
 
+
 /* ------------------------------------------------------------------
 Helper: render inline Markdown (**bold**, *italic*, `code`)
 ------------------------------------------------------------------- */
 const renderInlineMarkdown = (text) => {
-  const parts = [];
-  const tokens = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
+  const tokens = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`|\\\|)/g);
 
-  tokens.forEach((token, idx) => {
-    if (!token) return;
+  return tokens.map((token, idx) => {
+    if (!token) return null;
+
+    if (token === "\\|") {
+      return "|";
+    }
 
     if (token.startsWith("**") && token.endsWith("**")) {
-      parts.push(
+      return (
         <strong key={`bold-${idx}`} className="font-semibold">
           {token.slice(2, -2)}
-        </strong>,
+        </strong>
       );
-    } else if (token.startsWith("*") && token.endsWith("*")) {
-      parts.push(
+    }
+
+    if (token.startsWith("*") && token.endsWith("*")) {
+      return (
         <em key={`italic-${idx}`} className="italic">
           {token.slice(1, -1)}
-        </em>,
+        </em>
       );
-    } else if (token.startsWith("`") && token.endsWith("`")) {
-      parts.push(
+    }
+
+    if (token.startsWith("`") && token.endsWith("`")) {
+      return (
         <code
           key={`code-${idx}`}
           className="px-1 py-0.5 rounded bg-[var(--bg-secondary,#f3f4f6)] text-xs font-mono text-[var(--text-main,#111)]"
         >
           {token.slice(1, -1)}
-        </code>,
+        </code>
       );
-    } else {
-      parts.push(token);
     }
-  });
 
-  return parts;
+    return token;
+  });
 };
 
 /* ------------------------------------------------------------------
