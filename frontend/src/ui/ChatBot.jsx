@@ -60,7 +60,7 @@ const ChatBot = () => {
   // Initialize state from sessionStorage if available, default to 60
   const [leftWidth, setLeftWidth] = useState(() => {
     const savedWidth = sessionStorage.getItem("chatLeftWidth");
-    return savedWidth ? parseFloat(savedWidth) : 60;
+    return savedWidth ? parseFloat(savedWidth) : 70;
   });
 
   const isDragging = useRef(false);
