@@ -24,6 +24,8 @@ const endpoints = {
   // Files
   uploadFiles: (chatId) =>
     `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files`,
+  downloadFile: (chatId, fileId) =>
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}/download`,
   deleteFile: (chatId, fileId) =>
     `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}`,
 };

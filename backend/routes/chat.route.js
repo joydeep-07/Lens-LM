@@ -5,11 +5,14 @@ import {
   getChats,
   getChat,
   deleteChat,
+  sendChatMessage,
+} from "../controllers/chat.controller.js";
+import {
   uploadChatFiles,
   deleteChatFile,
+  downloadChatFile,
   upload,
-} from "../controllers/chat.controller.js";
-import { sendChatMessage } from "../controllers/chat.controller.js";
+} from "../controllers/file.controller.js";
 
 const router = express.Router();
 
@@ -33,6 +36,12 @@ router.post(
   authMiddleware,
   upload.array("files", 5),
   uploadChatFiles,
+);
+
+router.get(
+  "/chats/:chatId/files/:fileId/download",
+  authMiddleware,
+  downloadChatFile,
 );
 
 router.delete("/chats/:chatId/files/:fileId", authMiddleware, deleteChatFile);

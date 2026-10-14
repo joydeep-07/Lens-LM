@@ -74,8 +74,12 @@ const Files = () => {
   const handleConfirmDelete = async () => {
     if (!fileToDelete) return;
     try {
-      await api.delete(endpoints.deleteFile(fileToDelete.chatId, fileToDelete.id));
-      setFilesList((prev) => prev.filter((file) => file.id !== fileToDelete.id));
+      await api.delete(
+        endpoints.deleteFile(fileToDelete.chatId, fileToDelete.id),
+      );
+      setFilesList((prev) =>
+        prev.filter((file) => file.id !== fileToDelete.id),
+      );
     } catch (error) {
       console.error("Failed to delete file:", error);
       alert("Failed to delete file.");
