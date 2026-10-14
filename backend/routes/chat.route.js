@@ -5,6 +5,7 @@ import {
   getChats,
   getChat,
   deleteChat,
+  renameChat,
   sendChatMessage,
 } from "../controllers/chat.controller.js";
 import {
@@ -24,7 +25,7 @@ router.post("/chats", authMiddleware, createChat);
 router.get("/chats", authMiddleware, getChats);
 router.get("/chats/:chatId", authMiddleware, getChat);
 router.delete("/chats/:chatId", authMiddleware, deleteChat);
-
+router.patch("/chats/:chatId/rename", authMiddleware, renameChat);
 router.post("/chats/:chatId/messages", authMiddleware, sendChatMessage);
 
 // =============================================

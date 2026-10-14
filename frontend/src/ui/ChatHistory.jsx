@@ -19,6 +19,7 @@ import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import RenderText from "../components/RenderText";
 import DeleteModal from "../components/DeleteModal"; 
+import RenameChat from "./RenameChat";
 
 const ChatHistory = ({ onResumeChat }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,6 +182,19 @@ const ChatHistory = ({ onResumeChat }) => {
     URL.revokeObjectURL(url);
   };
 
+  // Handler to update title in state after successful rename
+  const handleChatRenamed = (chatId, newTitle) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === chatId ? { ...chat, title: newTitle } : chat,
+      ),
+    );
+
+    if (activeChatData && activeChatData.id === chatId) {
+      setActiveChatData((prev) => ({ ...prev, title: newTitle }));
+    }
+  };
+
   return (
     <div className="border border-[var(--border-light)]/50 flex overflow-hidden rounded-xl h-150 w-6xl bg-[var(--bg-main)] text-[var(--text-main)] shadow-2xl relative">
       {/* LEFT PANEL */}
@@ -259,6 +273,14 @@ const ChatHistory = ({ onResumeChat }) => {
                     </span>
 
                     <div className="flex items-center gap-1 shrink-0">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        <RenameChat
+                          chatId={chat.id}
+                          currentTitle={chat.title}
+                          onChatRenamed={handleChatRenamed}
+                        />
+                      </div>
+
                       <button
                         onClick={(e) => togglePin(chat.id, e)}
                         title={
@@ -282,7 +304,7 @@ const ChatHistory = ({ onResumeChat }) => {
                             : "var(--text-muted)",
                         }}
                       >
-                        <Pin size={12} />
+                        <Pin size={14} />
                       </button>
 
                       <button
@@ -294,7 +316,7 @@ const ChatHistory = ({ onResumeChat }) => {
                           color: "var(--google-red)",
                         }}
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </div>
@@ -483,6 +505,6 @@ const ChatHistory = ({ onResumeChat }) => {
       />
     </div>
   );
-};
+};;
 
 export default ChatHistory;

@@ -250,3 +250,42 @@ export const sendChatMessage = async (req, res) => {
     });
   }
 };
+
+export const renameChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const { title } = req.body;
+
+    if (!title || typeof title !== "string" || !title.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid chat title.",
+      });
+    }
+
+    // Find the chat and ensure it belongs to the authenticated user
+    const chat = await Chat.findOne({ _id: chatId, user: req.user._id });
+
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: "Chat not found.",
+      });
+    }
+
+    chat.title = title.trim();
+    await chat.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Chat renamed successfully.",
+      chat,
+    });
+  } catch (error) {
+    console.error("Rename chat error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to rename the chat.",
+    });
+  }
+};
