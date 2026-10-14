@@ -130,9 +130,11 @@ void main() {
     return;
   }
 
+  // sphere height: 0 at the rim, 1 at the center
   float z = sqrt(max(r * r - d * d, 0.0)) / r;
-  float nd = d / r;
+  float nd = d / r; // 0 at the center, 1 at the rim
 
+  // refraction is confined to a narrow band near the rim; the rest stays undistorted
   vec2 dir = d > 0.0 ? p / d : vec2(0.0);
   float lens = smoothstep(0.85, 1.0, nd) * pow(nd, 6.0);
   vec2 offset = -dir * lens * uRefraction * 0.15;
@@ -143,9 +145,11 @@ void main() {
   light.g = texture(uScene, toUv(p + offset)).g;
   light.b = texture(uScene, toUv(p + offset + disp)).b;
 
+  // neutral fresnel rim (no color tint so the glass stays clear)
   float fres = pow(1.0 - z, 3.0);
   vec3 rim = vec3(1.0) * fres * 0.18;
 
+  // specular highlight from the upper-left
   vec2 lightDir = normalize(vec2(-0.55, 0.6));
   float spec = pow(max(dot(p / max(r, 1e-4), lightDir), 0.0), 6.0);
   spec *= smoothstep(r, r * 0.55, d);
@@ -153,8 +157,10 @@ void main() {
   vec3 emissive = light + rim + vec3(spec) * 0.4;
   float emissiveA = clamp(max(max(emissive.r, emissive.g), emissive.b), 0.0, 1.0);
 
+  // almost clear glass body: only a faint neutral darkening, mostly near the rim
   float bodyA = 0.05 + fres * 0.05;
 
+  // composite emissive light over the clear body (premultiplied)
   float outA = emissiveA + bodyA * (1.0 - emissiveA);
   vec3 outRGB = emissive;
 
@@ -230,16 +236,11 @@ export default function Strands({
       alpha: true,
       premultipliedAlpha: true,
       antialias: true,
-      dpr: Math.min(window.devicePixelRatio, 2),
     });
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 0);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-    gl.canvas.style.width = "100%";
-    gl.canvas.style.height = "100%";
-    gl.canvas.style.display = "block";
     gl.canvas.style.backgroundColor = "transparent";
 
     const geometry = new Triangle(gl);
@@ -252,9 +253,7 @@ export default function Strands({
       fragment: FRAG,
       uniforms: {
         uTime: { value: 0 },
-        uResolution: {
-          value: [ctn.clientWidth || 300, ctn.clientHeight || 150],
-        },
+        uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
         uColors: { value: buildPalette(propsRef.current.colors) },
         uColorCount: {
           value: Math.min(propsRef.current.colors.length, MAX_COLORS),
@@ -278,8 +277,8 @@ export default function Strands({
     const mesh = new Mesh(gl, { geometry, program });
 
     const renderTarget = new RenderTarget(gl, {
-      width: ctn.clientWidth || 300,
-      height: ctn.clientHeight || 150,
+      width: ctn.offsetWidth,
+      height: ctn.offsetHeight,
     });
 
     const glassProgram = new Program(gl, {
@@ -287,9 +286,7 @@ export default function Strands({
       fragment: GLASS_FRAG,
       uniforms: {
         uScene: { value: renderTarget.texture },
-        uResolution: {
-          value: [ctn.clientWidth || 300, ctn.clientHeight || 150],
-        },
+        uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
         uRadius: { value: 0.46 * glassSize },
         uRefraction: { value: refraction },
         uDispersion: { value: dispersion },
@@ -299,21 +296,16 @@ export default function Strands({
 
     ctn.appendChild(gl.canvas);
 
-    const resize = () => {
+    function resize() {
       if (!ctn) return;
-      const width = ctn.clientWidth;
-      const height = ctn.clientHeight;
-      if (width === 0 || height === 0) return;
+      const width = ctn.offsetWidth;
+      const height = ctn.offsetHeight;
       renderer.setSize(width, height);
       program.uniforms.uResolution.value = [width, height];
       renderTarget.setSize(width, height);
       glassProgram.uniforms.uResolution.value = [width, height];
-    };
-
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-    });
-    resizeObserver.observe(ctn);
+    }
+    window.addEventListener("resize", resize);
     resize();
 
     let animateId = 0;
@@ -358,12 +350,13 @@ export default function Strands({
 
     return () => {
       cancelAnimationFrame(animateId);
-      resizeObserver.disconnect();
+      window.removeEventListener("resize", resize);
       if (ctn && gl.canvas.parentNode === ctn) {
         ctn.removeChild(gl.canvas);
       }
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

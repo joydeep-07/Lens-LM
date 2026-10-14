@@ -155,7 +155,7 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
       <div className="flex-1 flex flex-col h-full overflow-y-auto relative">
         {/* Absolute Background Strands Layer */}
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-50">
-          <div className="flex items-center justify-center ml-35 w-full h-full">
+          <div className="flex items-center justify-center w-full h-full">
             <Strands
               colors={[
                 "#4285f4", // Google Blue
@@ -166,13 +166,13 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
               count={4}
               speed={0.5}
               amplitude={1}
-              waviness={1}
+              waviness={0.5}
               thickness={0.7}
-              glow={1.6}
+              glow={1}
               taper={4}
               spread={1}
               intensity={0.6}
-              saturation={1.5}
+              saturation={2.5}
               opacity={0.8}
               scale={2}
               glass={false}
