@@ -10,11 +10,11 @@ const EmptyChat = () => {
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 10) {
-      return "Good morning";
-    } else if (hour < 17) {
+      return "Good Morning";
+    } else if (hour < 16) {
       return "What's up";
     } else {
-      return "Good evening";
+      return "Good Evening";
     }
   };
 
