@@ -125,8 +125,9 @@ const Files = () => {
     if (["pdf"].includes(extension)) return "./pdf.svg";
     if (["xls", "xlsx", "csv"].includes(extension)) return "./excel.svg";
     if (["jpg", "png", "jpeg"].includes(extension)) return "./image.svg";
-    if (["js", "jsx", "py"].includes(extension)) return "./javascript.svg";
-    if (["html", "css"].includes(extension)) return "./html.svg";
+    if (["js", "jsx", "py", "html", "css"].includes(extension))
+      return "./code.svg";
+    if ([].includes(extension)) return "./html.svg";
     return "./icons.svg";
   };
 
