@@ -1,8 +1,47 @@
 import React from "react";
 import { easeInOut, motion } from "framer-motion";
+import { useSelector } from "react-redux";
 import GradientText from "../components/GradientText";
 
 const EmptyChat = () => {
+  const user = useSelector((state) => state.auth.user);
+
+  // Determine greeting based on current time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 10) {
+      return "Good morning";
+    } else if (hour < 17) {
+      return "What's up";
+    } else {
+      return "Good evening";
+    }
+  };
+
+  // Get user name and randomly display last name, first name, or full name
+  const getDisplayName = () => {
+    const fullName = user?.name || user?.fullName || "";
+    if (!fullName) return "";
+
+    const nameParts = fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName =
+      nameParts.length > 1 ? nameParts[nameParts.length - 1] : firstName;
+
+    const randomChoice = Math.random();
+    if (randomChoice < 0.33) {
+      return firstName; // Sometimes first name
+    } else {
+      return firstName; // you can dsplay last name
+    } 
+  };
+
+  const greeting = getGreeting();
+  const displayName = getDisplayName();
+  const headingText = displayName
+    ? `${greeting}, ${displayName}`
+    : `${greeting}`;
+
   const suggestions = [
     {
       title: "Summarize",
@@ -28,12 +67,12 @@ const EmptyChat = () => {
           variant="linear"
           glow={0}
         >
-          <h1 className="mb-1.5 font-heading text-6xl font-light tracking-tight text-[var(--text-main)]">
-            Hello There!
+          <h1 className="mb-4 font-heading text-5xl font-light tracking-tight text-[var(--text-main)]">
+            {headingText}{" "}!
           </h1>
         </GradientText>
 
-        <p className="max-w-lg text-sm font-normal leading-relaxed tracking-wide text-[var(--text-secondary)]">
+        <p className="max-w-lg text-xs font-normal leading-relaxed tracking-wide text-[var(--text-secondary)]">
           Upload documents, ask questions, and get intelligent answers, concise
           summaries, and clear explanations.
         </p>
