@@ -19,6 +19,7 @@ import Logo from "../components/Logo";
 import axios from "../api/axios";
 import endpoints from "../api/endpoints";
 import { loginSuccess } from "../redux/authSlice";
+import StatusBadge from "../ui/StatusBadge";
 
 const Auth = ({ className = "" }) => {
   const dispatch = useDispatch();
@@ -195,12 +196,7 @@ const Auth = ({ className = "" }) => {
           </div>
 
           {/* STATUS BADGE */}
-          <div className="flex items-center justify-end shrink-0">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-light)] text-[10px] font-medium text-[var(--text-secondary)]">
-              <span className="h-2 w-2 rounded-full bg-[var(--google-green)] animate-pulse" />
-              <span>v2.4 Live</span>
-            </div>
-          </div>
+          <StatusBadge />
         </div>
       </nav>
 

@@ -20,6 +20,7 @@ import ChatInput from "./ChatInput";
 import NewChatButton from "./NewChatButton";
 import Wifi from "./Wifi";
 import ThoughtLine from "./ThoughtLine";
+import StatusBadge from "./StatusBadge";
 
 const ChatBot = () => {
   const [message, setMessage] = useState("");
@@ -264,9 +265,9 @@ const ChatBot = () => {
               Lens L<span className="text-lg ">M</span>.
             </h1>
           </div>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-3">
             <Wifi />
-            <NewChatButton onClick={handleNewChat} />
+            <StatusBadge />
           </div>
         </nav>
 
