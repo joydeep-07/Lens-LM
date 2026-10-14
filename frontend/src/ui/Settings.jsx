@@ -24,11 +24,11 @@ import GeneralSettings from "../settings/General";
 import ProfileSettings from "../settings/ProfileSettings";
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState("account");
 
   const tabs = [
-    { id: "general", label: "General", icon: SettingsIcon },
     { id: "account", label: "Account", icon: User },
+    { id: "general", label: "General", icon: SettingsIcon },
     { id: "privacy", label: "Privacy", icon: Shield },
     // { id: "billing", label: "Billing", icon: CreditCard },
     { id: "capabilities", label: "Capabilities", icon: Cpu },

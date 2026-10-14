@@ -185,13 +185,13 @@ const StatusBadge = () => {
             {/* Status title */}
             <h2
               id="status-modal-title"
-              className="mt-4 text-center text-base font-semibold tracking-wide text-[var(--text-main)]"
+              className="mt-4 text-center font-heading text-lg font-medi tracking-wider text-[var(--text-main)]"
             >
               {isHealthy === null
                 ? "Checking system status..."
                 : isHealthy
-                  ? `System ${VERSION} is fully operational`
-                  : `System ${VERSION} is experiencing issues`}
+                  ? `Version ${VERSION} is fully operational`
+                  : `Version ${VERSION} is experiencing issues`}
             </h2>
 
             {/* Status description */}
