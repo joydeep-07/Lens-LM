@@ -18,14 +18,16 @@ import SegmentedControl from "../components/SegmentedControl";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import RenderText from "../components/RenderText";
-import DeleteModal from "../components/DeleteModal"; 
+import DeleteModal from "../components/DeleteModal";
 import RenameChat from "./RenameChat";
+import { formatDate } from "../utils/dateFormatter";
 
 const ChatHistory = ({ onResumeChat }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("All");
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
+
   const [activeChatData, setActiveChatData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -243,13 +245,11 @@ const ChatHistory = ({ onResumeChat }) => {
             filteredChats.map((chat) => {
               const isSelected = selectedChat === chat.id;
 
-              const firstUserMessage = getFirstUserMessage(chat);
-
               return (
                 <div
                   key={chat.id}
                   onClick={() => setSelectedChat(chat.id)}
-                  className={`group relative p-2.5 rounded-lg cursor-pointer text-left flex flex-col gap-1 transition-colors ${
+                  className={`relative p-2.5 rounded-lg cursor-pointer text-left flex flex-col gap-1 transition-colors ${
                     isSelected
                       ? "text-[var(--text-main)]"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-main)]"
@@ -273,7 +273,14 @@ const ChatHistory = ({ onResumeChat }) => {
                     </span>
 
                     <div className="flex items-center gap-1 shrink-0">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                      {/* Rename chat button - visible only on active/selected tab */}
+                      <div
+                        className={`flex items-center transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 pointer-events-none"
+                        }`}
+                      >
                         <RenameChat
                           chatId={chat.id}
                           currentTitle={chat.title}
@@ -281,6 +288,7 @@ const ChatHistory = ({ onResumeChat }) => {
                         />
                       </div>
 
+                      {/* Pin button - visible if pinned or active */}
                       <button
                         onClick={(e) => togglePin(chat.id, e)}
                         title={
@@ -294,9 +302,9 @@ const ChatHistory = ({ onResumeChat }) => {
                             : "Pin conversation"
                         }
                         className={`p-1 rounded hover:bg-[var(--bg-secondary)] transition-opacity ${
-                          chat.pinned
+                          chat.pinned || isSelected
                             ? "opacity-100"
-                            : "opacity-0 group-hover:opacity-100"
+                            : "opacity-0 pointer-events-none"
                         }`}
                         style={{
                           color: chat.pinned
@@ -307,11 +315,16 @@ const ChatHistory = ({ onResumeChat }) => {
                         <Pin size={14} />
                       </button>
 
+                      {/* Delete button - visible only on active/selected tab */}
                       <button
                         onClick={(e) => promptDeleteChat(chat.id, e)}
                         title="Delete conversation"
                         aria-label="Delete conversation"
-                        className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-[var(--bg-secondary)] transition-opacity"
+                        className={`p-1 rounded hover:bg-[var(--bg-secondary)] transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 pointer-events-none"
+                        }`}
                         style={{
                           color: "var(--google-red)",
                         }}
@@ -321,18 +334,15 @@ const ChatHistory = ({ onResumeChat }) => {
                     </div>
                   </div>
 
-                  <p className="relative z-10 text-[11px] truncate text-[var(--text-muted)]">
-                    {firstUserMessage}
-                  </p>
-
                   <div className="relative z-10 flex items-center justify-between pt-1 text-[10px] text-[var(--text-muted)]">
                     <span className="flex items-center gap-1">
                       <Clock size={10} />
-                      {chat.date ??
-                        new Date(chat.updatedAt).toLocaleDateString()}
+                      {chat.date
+                        ? formatDate(chat.date)
+                        : chat.updatedAt
+                          ? formatDate(chat.updatedAt)
+                          : null}
                     </span>
-
-                    <span>{chat.messages?.length ?? 0} msgs</span>
                   </div>
                 </div>
               );
@@ -505,6 +515,6 @@ const ChatHistory = ({ onResumeChat }) => {
       />
     </div>
   );
-};;
+};
 
 export default ChatHistory;
