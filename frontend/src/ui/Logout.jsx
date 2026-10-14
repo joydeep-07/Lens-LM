@@ -15,12 +15,10 @@ const Logout = () => {
     setLoading(true);
 
     try {
-      // Ask the backend to invalidate the session.
       await api.post(endpoints.logout);
     } catch (error) {
       console.error("Backend logout failed:", error);
     } finally {
-      // Clear Redux state and authentication data from localStorage.
       dispatch(logoutSuccess());
 
       setLoading(false);
