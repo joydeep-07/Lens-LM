@@ -10,15 +10,16 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SegmentedControl from "../components/SegmentedControl";
-import DeleteModal from "../components/DeleteModal"; // Adjust path if needed
+import DeleteModal from "../components/DeleteModal"; 
+import FileSkeleton from "../skeleton/FileSkeleton"; 
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
-import { formatDate } from "../utils/dateFormatter"; // Adjust path if needed
+import { formatDate } from "../utils/dateFormatter"; 
 
 const Files = () => {
   const [filesList, setFilesList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState("Grid"); // "Grid" | "Tiles"
+  const [viewMode, setViewMode] = useState("Grid"); 
   const [isLoading, setIsLoading] = useState(true);
 
   // Delete modal state
@@ -172,9 +173,7 @@ const Files = () => {
         {/* Files Content Area */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6">
           {isLoading ? (
-            <div className="flex items-center justify-center h-full text-xs text-[var(--text-muted)]">
-              Loading your files...
-            </div>
+            <FileSkeleton viewMode={viewMode} />
           ) : filteredFiles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-2">
               <FileText

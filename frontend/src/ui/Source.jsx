@@ -120,14 +120,10 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
             </span>
           )}
         </div>
-
-        <PopupModal
-          icon={Coffee}
-          title="Buy me a chai"
-          ariaLabel="Buy me a chai"
-        >
+        
+       
           <QrCode />
-        </PopupModal>
+        
       </nav>
 
       {/* Hidden File Input */}
@@ -156,7 +152,7 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <h3 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
-                  Added files 
+                  Added files
                 </h3>
                 <button
                   type="button"

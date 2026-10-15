@@ -9,8 +9,9 @@ import {
   VolumeX,
   Menu,
   X,
+  Logs,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, easeInOut } from "framer-motion";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
 import RenderText from "../components/RenderText";
@@ -438,18 +439,19 @@ const ChatBot = () => {
       {/* ==================== MOBILE LAYOUT ==================== */}
       <div className="flex md:hidden flex-col w-full h-full overflow-hidden relative bg-[var(--bg-main)]">
         {/* Mobile Navbar */}
-        <nav className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-light)]/50 shrink-0">
+        <nav className="flex items-center justify-between px-3 py-3 shrink-0">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsMobileSidePanelOpen(true)}
               className="p-1 rounded-lg text-[var(--text-main)] hover:bg-[var(--bg-secondary)]"
             >
-              <Menu size={20} />
+              <div className="flex gap-4">
+                <img src="./logo.svg" className="h-7" alt="" />
+                <h1 className="text-2xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
+                  Lens L<span className="text-sm">M</span>.
+                </h1>
+              </div>
             </button>
-            <img src="./logo.svg" className="h-7" alt="" />
-            <h1 className="text-xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
-              Lens L<span className="text-sm">M</span>.
-            </h1>
           </div>
           <div className="flex items-center gap-2">
             <Wifi />
@@ -577,16 +579,13 @@ const ChatBot = () => {
                 transition={{ type: "spring", damping: 25, stiffness: 250 }}
                 className="absolute top-0 left-0 bottom-0 w-54 bg-[var(--bg-main)] border-r border-[var(--border-light)]/50 z-50 flex flex-col md:hidden shadow-2xl"
               >
-                <div className="flex items-center justify-between p-3 border-b border-[var(--border-light)]/50 shrink-0">
-                  <h2 className="text-lg font-light text-[var(--text-main)]/85 font-heading">
-                    Menu
-                  </h2>
-                  <button
-                    onClick={() => setIsMobileSidePanelOpen(false)}
-                    className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)]"
-                  >
-                    <X size={20} />
-                  </button>
+                <div className="flex items-center justify-between px-3 py-3 shrink-0">
+                  <div className="flex items-center gap-4">
+                    <img src="./logo.svg" className="w-7" alt="" />
+                    <h2 className="text-2xl font-light text-[var(--text-main)]/85 font-heading">
+                      Lens L<span className="text-sm">M</span>.
+                    </h2>
+                  </div>
                 </div>
                 <div className="flex-1 overflow-y-auto">
                   <SidePanel
@@ -617,11 +616,17 @@ const ChatBot = () => {
                 initial={{ y: "100%" }}
                 animate={{ y: "0%" }}
                 exit={{ y: "100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="absolute inset-x-0 bottom-0 top-[30%] bg-[var(--bg-main)] rounded-t-2xl border-t border-[var(--border-light)] z-50 flex flex-col md:hidden shadow-2xl overflow-hidden"
+                transition={{
+                  duration: 0.45,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="absolute inset-x-0 bottom-0 top-[30%] bg-[var(--bg-main)] rounded-t-2xl border-t-2 border-[var(--accent-primary)]/50 z-50 flex flex-col md:hidden shadow-2xl overflow-hidden"
               >
-                <div className="flex items-center justify-between p-2 border-b border-[var(--border-light)]/50 shrink-0">
-                  <h2 className="text-lg font-light text-[var(--text-main)]/80 font-heading">
+                <div className="flex items-center justify-between px-5 py-3 shrink-0">
+                  <h2 className="text-xl flex items-center gap-3 tracking-wide font-light text-[var(--text-main)]/80 font-heading">
+                    <span>
+                      <Logs size={18} />
+                    </span>
                     Sources
                   </h2>
                   <button
