@@ -1,15 +1,11 @@
-import fs from "fs/promises";
+// controllers/chat.controller.js
 import { getGroqChatCompletion } from "../services/ai.service.js";
 import { getRagAnswer, deleteChatChunks } from "../services/rag.service.js";
+import { deleteFromCloudinary } from "../services/cloudinary.service.js";
 
 import Chat from "../models/chat.model.js";
 
 const isValidObjectId = (id) => /^[a-f\d]{24}$/i.test(String(id || ""));
-
-// ======================================================
-// 1. CREATE CHAT
-// POST /api/auth/chats
-// ======================================================
 
 export const createChat = async (req, res) => {
   try {
@@ -42,18 +38,12 @@ export const createChat = async (req, res) => {
     });
   } catch (error) {
     console.error("Create chat error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to create chat.",
     });
   }
 };
-
-// ======================================================
-// 2. GET ALL USER CHATS
-// GET /api/auth/chats
-// ======================================================
 
 export const getChats = async (req, res) => {
   try {
@@ -71,18 +61,12 @@ export const getChats = async (req, res) => {
     });
   } catch (error) {
     console.error("Get chats error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to retrieve chats.",
     });
   }
 };
-
-// ======================================================
-// 3. GET SINGLE CHAT
-// GET /api/auth/chats/:chatId
-// ======================================================
 
 export const getChat = async (req, res) => {
   try {
@@ -115,18 +99,12 @@ export const getChat = async (req, res) => {
     });
   } catch (error) {
     console.error("Get chat error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to retrieve the chat.",
     });
   }
 };
-
-// ======================================================
-// 4. DELETE CHAT
-// DELETE /api/auth/chats/:chatId
-// ======================================================
 
 export const deleteChat = async (req, res) => {
   try {
@@ -154,17 +132,14 @@ export const deleteChat = async (req, res) => {
     await Promise.all(
       chat.files.map(async (file) => {
         try {
-          await fs.unlink(file.storagePath);
+          await deleteFromCloudinary(file.storedName);
         } catch (error) {
-          if (error.code !== "ENOENT") {
-            console.error("File cleanup error:", error.message);
-          }
+          console.error("Cloudinary file cleanup error:", error.message);
         }
       }),
     );
 
     await deleteChatChunks(chat._id);
-
     await chat.deleteOne();
 
     return res.status(200).json({
@@ -173,18 +148,12 @@ export const deleteChat = async (req, res) => {
     });
   } catch (error) {
     console.error("Delete chat error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to delete the chat.",
     });
   }
 };
-
-// ======================================================
-// 5. SEND MESSAGE & GET AI RESPONSE
-// POST /api/auth/chats/:chatId/messages
-// ======================================================
 
 export const sendChatMessage = async (req, res) => {
   try {
@@ -216,12 +185,12 @@ export const sendChatMessage = async (req, res) => {
       content: message.trim(),
     });
 
-    const modelMap = {
-      "Nova Mini": "openai/gpt-oss-20b",
-      "Nova Pro": "openai/gpt-oss-120b",
-      "Lens Ultra": "openai/gpt-oss-120b",
-    };
-    const selectedGroqModel = modelMap[model] || "openai/gpt-oss-20b";
+   const modelMap = {
+     "Nova Mini": "openai/gpt-oss-20b",
+     "Nova Pro": "openai/gpt-oss-120b",
+     "Lens Ultra": "openai/gpt-oss-120b",
+   };
+   const selectedGroqModel = modelMap[model] || "openai/gpt-oss-120b";
 
     const aiResponseText = await getRagAnswer(
       chat,
@@ -263,7 +232,6 @@ export const renameChat = async (req, res) => {
       });
     }
 
-    // Find the chat and ensure it belongs to the authenticated user
     const chat = await Chat.findOne({ _id: chatId, user: req.user._id });
 
     if (!chat) {

@@ -12,8 +12,8 @@ import {
   uploadChatFiles,
   deleteChatFile,
   downloadChatFile,
-  upload,
 } from "../controllers/file.controller.js";
+import { upload } from "../services/cloudinary.service.js";
 
 const router = express.Router();
 

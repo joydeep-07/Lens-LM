@@ -1,5 +1,7 @@
+// services/ai.service.js
 import Groq from "groq-sdk";
-import { DEFAULT_SYSTEM_PROMPT } from "../config/prompts.js"; 
+import axios from "axios";
+import { DEFAULT_SYSTEM_PROMPT } from "../config/prompts.js";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -8,7 +10,7 @@ const groq = new Groq({
 export const getGroqChatCompletion = async (
   messages,
   modelName = "llama-3.3-70b-versatile",
-  systemPrompt = DEFAULT_SYSTEM_PROMPT, 
+  systemPrompt = DEFAULT_SYSTEM_PROMPT,
 ) => {
   try {
     const formattedMessages = [
@@ -30,5 +32,15 @@ export const getGroqChatCompletion = async (
   } catch (error) {
     console.error("Groq API error:", error.message);
     throw new Error("Failed to communicate with AI service.");
+  }
+};
+
+export const fetchFileContentFromUrl = async (url, ext) => {
+  if (ext === ".pdf" || ext === ".docx" || ext === ".doc") {
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    return Buffer.from(response.data);
+  } else {
+    const response = await axios.get(url, { responseType: "text" });
+    return response.data;
   }
 };

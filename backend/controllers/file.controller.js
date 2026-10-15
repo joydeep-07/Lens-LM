@@ -1,58 +1,10 @@
-import crypto from "crypto";
-import multer from "multer";
+// controllers/file.controller.js
 import path from "path";
-import fs from "fs/promises";
 import Chat from "../models/chat.model.js";
 import { indexChatFile } from "../services/rag.service.js";
+import { deleteFromCloudinary } from "../services/cloudinary.service.js";
 
-// ======================================================
-// FILE UPLOAD CONFIGURATION & CONSTANTS
-// ======================================================
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_FILES_PER_REQUEST = 5;
 const MAX_FILES_PER_CHAT = 20;
-
-const UPLOAD_DIR = path.resolve("uploads");
-
-const ALLOWED_EXTENSIONS = new Set([
-  ".pdf",
-  ".txt",
-  ".doc",
-  ".docx",
-  ".md",
-  ".csv",
-  ".xls",
-  ".xlsx",
-  ".jpg",
-  ".jpeg",
-  ".png",
-  ".js",
-  ".py",
-  ".jsx",
-  ".html",
-  ".css",
-]);
-
-const ALLOWED_MIME_TYPES = new Set([
-  "application/pdf",
-  "text/plain",
-  "application/octet-stream",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "text/markdown",
-  "text/csv",
-  "application/vnd.ms-excel",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "image/jpeg",
-  "image/png",
-  "text/javascript",
-  "application/javascript",
-  "text/x-python",
-  "text/html",
-  "text/css",
-]);
-
 const isValidObjectId = (id) => /^[a-f\d]{24}$/i.test(String(id || ""));
 
 const sanitizeFilename = (filename) =>
@@ -61,56 +13,8 @@ const sanitizeFilename = (filename) =>
     .replace(/[\r\n]/g, "")
     .slice(0, 255);
 
-const storage = multer.diskStorage({
-  destination: async (req, file, callback) => {
-    try {
-      await fs.mkdir(UPLOAD_DIR, {
-        recursive: true,
-        mode: 0o700,
-      });
-
-      callback(null, UPLOAD_DIR);
-    } catch {
-      callback(new Error("Unable to prepare private file storage."));
-    }
-  },
-
-  filename: (req, file, callback) => {
-    const extension = path.extname(file.originalname).toLowerCase();
-    callback(null, `${crypto.randomUUID()}${extension}`);
-  },
-});
-
-export const upload = multer({
-  storage,
-  limits: {
-    fileSize: MAX_FILE_SIZE,
-    files: MAX_FILES_PER_REQUEST,
-    fields: 2,
-    parts: MAX_FILES_PER_REQUEST + 2,
-  },
-  fileFilter: (req, file, callback) => {
-    const extension = path.extname(file.originalname).toLowerCase();
-
-    if (!ALLOWED_EXTENSIONS.has(extension)) {
-      return callback(new Error("Unsupported file extension."));
-    }
-
-    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
-      return callback(new Error("Unsupported MIME type."));
-    }
-
-    callback(null, true);
-  },
-});
-
-// ======================================================
-// 1. UPLOAD FILES TO CHAT
-// POST /api/auth/chats/:chatId/files
-// ======================================================
-
 export const uploadChatFiles = async (req, res) => {
-  const uploadedPaths = (req.files || []).map((file) => file.path);
+  const uploadedFiles = req.files || [];
 
   try {
     const { chatId } = req.params;
@@ -122,7 +26,7 @@ export const uploadChatFiles = async (req, res) => {
       });
     }
 
-    if (!req.files?.length) {
+    if (!uploadedFiles.length) {
       return res.status(400).json({
         success: false,
         message: "Please select at least one file.",
@@ -141,7 +45,7 @@ export const uploadChatFiles = async (req, res) => {
       });
     }
 
-    if (chat.files.length + req.files.length > MAX_FILES_PER_CHAT) {
+    if (chat.files.length + uploadedFiles.length > MAX_FILES_PER_CHAT) {
       return res.status(400).json({
         success: false,
         message: `A chat can contain at most ${MAX_FILES_PER_CHAT} files.`,
@@ -150,36 +54,7 @@ export const uploadChatFiles = async (req, res) => {
 
     const detectedFiles = [];
 
-    for (const file of req.files) {
-      const extension = path.extname(file.originalname).toLowerCase();
-
-      const validPdf =
-        extension === ".pdf" && file.mimetype === "application/pdf";
-      const validDocx =
-        extension === ".docx" && file.mimetype.includes("wordprocessingml");
-      const validImage =
-        [".jpg", ".jpeg", ".png"].includes(extension) &&
-        file.mimetype.startsWith("image/");
-      const validTextOrCode = [
-        ".txt",
-        ".md",
-        ".csv",
-        ".js",
-        ".py",
-        ".jsx",
-        ".html",
-        ".css",
-        ".xls",
-        ".xlsx",
-        ".doc",
-      ].includes(extension);
-
-      if (!validPdf && !validDocx && !validImage && !validTextOrCode) {
-        throw new Error(
-          `Unsupported or invalid file format: ${sanitizeFilename(file.originalname)}`,
-        );
-      }
-
+    for (const file of uploadedFiles) {
       detectedFiles.push({
         originalName: sanitizeFilename(file.originalname),
         storedName: file.filename,
@@ -227,36 +102,13 @@ export const uploadChatFiles = async (req, res) => {
       })),
     });
   } catch (error) {
-    await Promise.all(
-      uploadedPaths.map(async (filePath) => {
-        try {
-          await fs.unlink(filePath);
-        } catch {
-          // Ignore cleanup failures.
-        }
-      }),
-    );
-
-    if (error.message.startsWith("Unsupported or invalid file format:")) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-
     console.error("Upload files error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to upload the files.",
     });
   }
 };
-
-// ======================================================
-// 2. DELETE FILE FROM CHAT
-// DELETE /api/auth/chats/:chatId/files/:fileId
-// ======================================================
 
 export const deleteChatFile = async (req, res) => {
   try {
@@ -290,13 +142,7 @@ export const deleteChatFile = async (req, res) => {
       });
     }
 
-    try {
-      await fs.unlink(file.storagePath);
-    } catch (error) {
-      if (error.code !== "ENOENT") {
-        throw error;
-      }
-    }
+    await deleteFromCloudinary(file.storedName);
 
     file.deleteOne();
     await chat.save();
@@ -307,19 +153,12 @@ export const deleteChatFile = async (req, res) => {
     });
   } catch (error) {
     console.error("Delete chat file error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to delete the file.",
     });
   }
 };
-
-
-// ======================================================
-// 3. DOWNLOAD FILE FROM CHAT
-// GET /api/auth/chats/:chatId/files/:fileId/download
-// ======================================================
 
 export const downloadChatFile = async (req, res) => {
   try {
@@ -353,19 +192,9 @@ export const downloadChatFile = async (req, res) => {
       });
     }
 
-    // Send the file for download using its original filename
-    return res.download(file.storagePath, file.originalName, (err) => {
-      if (err && !res.headersSent) {
-        console.error("File download error:", err.message);
-        return res.status(500).json({
-          success: false,
-          message: "Unable to download the file.",
-        });
-      }
-    });
+    return res.redirect(file.storagePath);
   } catch (error) {
     console.error("Download chat file error:", error.message);
-
     return res.status(500).json({
       success: false,
       message: "Unable to process the file download.",

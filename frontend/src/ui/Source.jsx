@@ -1,6 +1,15 @@
 // src/ui/Source.jsx
 import React, { useRef, useState } from "react";
-import { FileText, Plus, File, X, Upload, Coffee, Logs } from "lucide-react";
+import {
+  FileText,
+  Plus,
+  File,
+  X,
+  Upload,
+  Coffee,
+  Logs,
+  Loader2,
+} from "lucide-react";
 import EmptySource from "./EmptySource";
 import QrCode from "./QrCode";
 import PopupModal from "../components/PopupModal";
@@ -93,7 +102,6 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
     return "./icons.svg";
   };
 
-
   return (
     <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-3 h-full overflow-hidden bg-[var(--bg-main)]">
       {/* Sources Navbar - hidden on mobile drawer since header handles it */}
@@ -140,7 +148,7 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
       <div className="flex flex-1 flex-col justify-between gap-3 overflow-hidden">
         {/* Top Section: Empty State or Added Files */}
         <div className="flex-1 overflow-y-auto pr-1 space-y-3">
-          {files.length === 0 ? (
+          {files.length === 0 && !isUploading ? (
             <div className="py-6 flex flex-col items-center justify-center h-full">
               <EmptySource />
             </div>
@@ -194,7 +202,7 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
                           <span className="h-1 w-1 rounded-full bg-[var(--text-muted)]/50" />
                         )}
                         <span className="inline-flex items-center gap-1.5 text-[var(--text-secondary)]/80">
-                          {isUploading ? "Uploading..." : "Ready"}
+                          Ready
                         </span>
                       </div>
                     </div>
@@ -214,6 +222,23 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
                   </div>
                 );
               })}
+
+              {/* Upload Loader State */}
+              {isUploading && (
+                <div className="flex items-center gap-3 rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-card)]/40 p-2.5 ">
+                  <div className="flex w-7 shrink-0 items-center justify-center text-[var(--accent-primary)]">
+                    <Loader2 size={22} className="animate-spin" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-medium tracking-tight text-[var(--text-primary)]">
+                      Uploading files...
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+                      Please wait while your files are processed
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -238,11 +263,19 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
           }`}
         >
           <div className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)] transition-colors">
-            <Upload size={15} strokeWidth={1.8} />
+            {isUploading ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <Upload size={15} strokeWidth={1.8} />
+            )}
           </div>
 
           <h3 className="text-xs md:text-sm font-light tracking-tight text-[var(--text-main)]">
-            {isDragging ? "Drop to upload" : "Drag files here or browse"}
+            {isUploading
+              ? "Uploading files..."
+              : isDragging
+                ? "Drop to upload"
+                : "Drag files here or browse"}
           </h3>
 
           {/* Supported File Types */}

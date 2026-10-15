@@ -1,10 +1,13 @@
-import fs from "fs/promises";
+// services/rag.service.js
 import path from "path";
 import PDFParser from "pdf2json";
 import mammoth from "mammoth";
 import { pipeline } from "@xenova/transformers";
 import DocumentChunk from "../models/document-chunk.model.js";
-import { getGroqChatCompletion } from "./ai.service.js";
+import {
+  getGroqChatCompletion,
+  fetchFileContentFromUrl,
+} from "./ai.service.js";
 
 let embedder = null;
 const getEmbedder = async () => {
@@ -32,7 +35,7 @@ export const warmUpEmbeddingModel = () => {
     .catch((err) => console.warn("[RAG] Warm-up failed:", err.message));
 };
 
-const extractTextFromPDF = (filePath) => {
+const extractTextFromPDFBuffer = (buffer) => {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser(null, 1);
     pdfParser.on("pdfParser_dataError", (errData) =>
@@ -46,19 +49,19 @@ const extractTextFromPDF = (filePath) => {
         reject(err);
       }
     });
-    pdfParser.loadPDF(filePath);
+    pdfParser.parseBuffer(buffer);
   });
 };
 
-const extractText = async (filePath, ext) => {
+const extractTextFromCloudinary = async (fileUrl, ext) => {
+  const data = await fetchFileContentFromUrl(fileUrl, ext);
   if (ext === ".pdf") {
-    return await extractTextFromPDF(filePath);
+    return await extractTextFromPDFBuffer(data);
   } else if (ext === ".docx" || ext === ".doc") {
-    const buffer = await fs.readFile(filePath);
-    const result = await mammoth.extractRawText({ buffer });
+    const result = await mammoth.extractRawText({ buffer: data });
     return result.value || "";
   } else {
-    return await fs.readFile(filePath, "utf-8");
+    return String(data);
   }
 };
 
@@ -85,7 +88,7 @@ export const indexChatFile = async (chat, file) => {
 
   try {
     const ext = path.extname(file.originalName).toLowerCase();
-    const rawText = await extractText(file.storagePath, ext);
+    const rawText = await extractTextFromCloudinary(file.storagePath, ext);
     const textChunks = chunkText(rawText);
 
     if (textChunks.length === 0) {
@@ -152,12 +155,6 @@ export const getRagAnswer = async (chat, userMessage, modelName) => {
   }));
 
   scored.sort((a, b) => b.score - a.score);
-  console.log(
-    "[RAG] Chunk similarity scores:",
-    scored.map((s) => s.score.toFixed(3)),
-  );
-
-  // Take the top 5 most relevant chunks directly without strict filtering
   const topChunks = scored.slice(0, 5);
 
   let systemPrompt = `You are Lens LM, an advanced AI model specialized in Retrieval-Augmented Generation (RAG). Use the provided document context to answer the user accurately.`;
