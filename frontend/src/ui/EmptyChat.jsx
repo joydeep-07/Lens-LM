@@ -58,7 +58,7 @@ const EmptyChat = () => {
   ];
 
   return (
-    <div className="relative flex h-full flex-col justify-between overflow-hidden px-8 py-10">
+    <div className="relative flex h-full flex-col justify-between overflow-hidden px-3 py-10">
       {/* Greeting */}
       <div className="relative z-10">
         <GradientText
@@ -67,8 +67,8 @@ const EmptyChat = () => {
           variant="linear"
           glow={0}
         >
-          <h1 className="mb-4 font-heading text-5xl font-light tracking-tight text-[var(--text-main)]">
-            {headingText}{" "}!
+          <h1 className="mb-4 font-heading text-3xl sm:text-4xl md:text-5xl font-light tracking-tight text-[var(--text-main)]">
+            {headingText}!
           </h1>
         </GradientText>
 
@@ -99,11 +99,10 @@ const EmptyChat = () => {
             "
           >
             <span className="mr-2 text-xs font-semibold text-[var(--text-main)]">
-              {item.title}
-            </span>
-
-            <span className="text-xs font-normal text-[var(--text-main)] opacity-50">
-              {item.description}
+              {item.title}{" "}
+              <span className="text-xs font-normal text-[var(--text-main)] opacity-50">
+                {item.description}
+              </span>
             </span>
           </motion.button>
         ))}

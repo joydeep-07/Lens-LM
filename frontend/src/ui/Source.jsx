@@ -21,7 +21,6 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
       setIsUploading(true);
       let activeChatId = chatId;
 
-      // If no active chat exists, automatically create a new one first
       if (!activeChatId) {
         const createRes = await api.post(endpoints.createChat, {
           title: newFilesArray[0].name.slice(0, 30),
@@ -34,7 +33,7 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
 
       const formData = new FormData();
       newFilesArray.forEach((file) => {
-        formData.append("files", file); // Matches backend multer field name ('files')
+        formData.append("files", file);
       });
 
       const response = await api.post(
@@ -80,7 +79,6 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
     }
   };
 
-  // Helper function to determine icon based on file extension
   const getFileIcon = (fileName) => {
     if (!fileName) return "./icons.svg";
     const extension = fileName.split(".").pop().toLowerCase();
@@ -95,16 +93,13 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
     return "./icons.svg";
   };
 
-  const handleCollapse = () => {
-    // Collapse / Expand logic handler
-  };
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-2 h-full overflow-hidden bg-[var(--bg-main)]">
-      {/* Sources Navbar */}
-      <nav className="flex items-center justify-between rounded-xl px-3 py-2 shrink-0">
+    <div className="flex w-full flex-col gap-3 rounded-xl border-l border-[var(--border-light)]/50 p-3 h-full overflow-hidden bg-[var(--bg-main)]">
+      {/* Sources Navbar - hidden on mobile drawer since header handles it */}
+      <nav className="hidden md:flex items-center justify-between rounded-xl px-3 py-2 shrink-0">
         <div className="flex items-center justify-between gap-4">
-          <button onClick={handleCollapse}>
+          <button>
             <Logs size={20} strokeWidth={1.8} />
           </button>
           <h2 className="text-xl font-light text-[var(--text-main)]/80 font-heading">
@@ -142,11 +137,13 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
       />
 
       {/* Sources Content Area */}
-      <div className="flex flex-1 flex-col justify-between gap-4 overflow-hidden">
+      <div className="flex flex-1 flex-col justify-between gap-3 overflow-hidden">
         {/* Top Section: Empty State or Added Files */}
         <div className="flex-1 overflow-y-auto pr-1 space-y-3">
           {files.length === 0 ? (
-            <EmptySource />
+            <div className="py-6 flex flex-col items-center justify-center h-full">
+              <EmptySource />
+            </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
@@ -173,12 +170,12 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
                 return (
                   <div
                     key={`${fileName}-${index}`}
-                    className="flex items-center gap-3 rounded-sm border border-[var(--border-light)]/10 bg-[var(--bg-card)]/30 p-3 transition-all hover:border-[var(--border-light)]/50"
+                    className="flex items-center gap-3 rounded-lg border border-[var(--border-light)]/20 bg-[var(--bg-card)]/40 p-2.5 transition-all hover:border-[var(--border-light)]/60"
                   >
                     <div className="flex w-7 shrink-0 items-center justify-center">
                       <img
                         src={getFileIcon(fileName)}
-                        className="h-8.5"
+                        className="h-7 w-7 object-contain"
                         alt=""
                       />
                     </div>
@@ -186,12 +183,12 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
                     <div className="min-w-0 flex-1">
                       <p
                         title={fileName}
-                        className="truncate text-sm font-medium tracking-tight text-[var(--text-primary)]"
+                        className="truncate text-xs font-medium tracking-tight text-[var(--text-primary)]"
                       >
                         {fileName}
                       </p>
 
-                      <div className="mt-1 flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                      <div className="mt-0.5 flex items-center gap-2 text-[10px] text-[var(--text-muted)]">
                         {fileSize && <span>{fileSize}</span>}
                         {fileSize && (
                           <span className="h-1 w-1 rounded-full bg-[var(--text-muted)]/50" />
@@ -210,9 +207,9 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
                         event.stopPropagation();
                         removeFile(fileId, index);
                       }}
-                      className="rounded-lg p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
+                      className="rounded-lg p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
                     >
-                      <X size={16} strokeWidth={1.8} />
+                      <X size={15} strokeWidth={1.8} />
                     </button>
                   </div>
                 );
@@ -234,26 +231,26 @@ const Source = ({ chatId, onChatCreated, files, setFiles }) => {
           }}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`group shrink-0 mt-auto flex h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-4 text-center transition-all duration-200 ${
+          className={`group shrink-0 mt-auto flex h-24 md:h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-3 text-center transition-all duration-200 ${
             isDragging
               ? "border-[var(--accent-primary)] bg-[var(--bg-secondary)] scale-[0.99]"
               : "border-[var(--border-light)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-secondary)]/50"
           }`}
         >
-          <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)] transition-colors">
-            <Upload size={16} strokeWidth={1.8} />
+          <div className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)] transition-colors">
+            <Upload size={15} strokeWidth={1.8} />
           </div>
 
-          <h3 className="text-sm font-light tracking-tight text-[var(--text-main)]">
+          <h3 className="text-xs md:text-sm font-light tracking-tight text-[var(--text-main)]">
             {isDragging ? "Drop to upload" : "Drag files here or browse"}
           </h3>
 
           {/* Supported File Types */}
-          <div className="mt-2.5 flex flex-wrap justify-center items-center gap-1">
+          <div className="mt-2 flex flex-wrap justify-center items-center gap-1">
             {["PDF", "TXT", "DOCX", "MD", "JPG", "PNG"].map((type) => (
               <span
                 key={type}
-                className="rounded border border-[var(--border-light)] px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-[var(--text-muted)] bg-[var(--bg-secondary)]/30"
+                className="rounded border border-[var(--border-light)] px-1.5 py-0.5 text-[8px] md:text-[9px] font-medium tracking-wide text-[var(--text-muted)] bg-[var(--bg-secondary)]/30"
               >
                 {type}
               </span>

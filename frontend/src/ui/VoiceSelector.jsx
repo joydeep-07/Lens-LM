@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Volume2, Check, Mic, Play, Speaker } from "lucide-react";
-import { motion } from "framer-motion"; // 1. Import motion
+import { motion } from "framer-motion";
 import Strands from "../components/Strands";
 
 const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
@@ -113,7 +113,6 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
                     : "text-[var(--text-secondary)] hover:text-[var(--text-main)]"
                 }`}
               >
-                {/* 2. Framer Motion layout transition background */}
                 {isSelected && (
                   <motion.div
                     layoutId="activeVoiceTab"
@@ -157,12 +156,7 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-50">
           <div className="flex items-center justify-center w-full h-full">
             <Strands
-              colors={[
-                "#4285f4", // Google Blue
-                "#ea4335", // Google Red
-                "#fbbc05", // Google Yellow
-                "#34a853", // Google Green
-              ]}
+              colors={["#4285f4", "#ea4335", "#fbbc05", "#34a853"]}
               count={4}
               speed={0.5}
               amplitude={1}
@@ -172,7 +166,7 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
               taper={4}
               spread={1}
               intensity={0.6}
-              saturation={2.5}
+              saturation={1.8}
               opacity={0.8}
               scale={2}
               glass={false}
@@ -205,7 +199,6 @@ const VoiceSelector = ({ selectedVoiceUri, setSelectedVoiceUri }) => {
                 </div>
 
                 <div className="space-y-1">
-                 
                   <p className="text-xs max-w-md text-[var(--text-secondary)] leading-relaxed">
                     Uses free native browser text-to-speech synthesis. Voices
                     adapt automatically based on your current browser and

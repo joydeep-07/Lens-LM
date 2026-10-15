@@ -7,6 +7,8 @@ import {
   RotateCw,
   Volume2,
   VolumeX,
+  Menu,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../api/axios";
@@ -42,14 +44,20 @@ const ChatBot = () => {
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const [isLevelDropdownOpen, setIsLevelDropdownOpen] = useState(false);
 
+  // Mobile drawer states
+  const [isMobileSourceOpen, setIsMobileSourceOpen] = useState(false);
+  const [isMobileSidePanelOpen, setIsMobileSidePanelOpen] = useState(false);
+
   const models = ["Nova Mini", "Nova Pro", "Lens Ultra"];
   const levels = ["High", "Medium", "Low"];
 
   const messagesEndRef = useRef(null);
+  const messagesEndMobileRef = useRef(null);
 
-  // Auto-scroll to bottom smoothly when messages update
+  // Auto-scroll to bottom smoothly when messages update or loading state changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndMobileRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
   // Track completed questions based on user message count (capped at 10)
@@ -58,7 +66,7 @@ const ChatBot = () => {
     10,
   );
 
-  // Initialize state from sessionStorage if available, default to 60
+  // Initialize state from sessionStorage if available, default to 70
   const [leftWidth, setLeftWidth] = useState(() => {
     const savedWidth = sessionStorage.getItem("chatLeftWidth");
     return savedWidth ? parseFloat(savedWidth) : 70;
@@ -225,6 +233,7 @@ const ChatBot = () => {
   const handleResumeChat = async (chatId) => {
     setCurrentChatId(chatId);
     window.dispatchEvent(new CustomEvent("close-popup-modal"));
+    setIsMobileSidePanelOpen(false);
 
     try {
       setIsLoading(true);
@@ -252,179 +261,375 @@ const ChatBot = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--main)] text-[var(--text-main)]">
-      {/* Left Panel */}
-      <div
-        style={{ width: `${leftWidth}%` }}
-        className="flex flex-col justify-between bg-[var(--bg-main)] rounded-xl border-r border-[var(--border-light)]/50 gap-2 p-2 shrink-0"
-      >
-        {/* Navbar */}
-        <nav className="flex items-center justify-between rounded-xl px-3 py-2">
-          <div className="flex gap-3 items-center">
-            <img src="./logo.svg" className="h-8" alt="" />
-            <h1 className="text-2xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
-              Lens L<span className="text-lg ">M</span>.
+      {/* ==================== DESKTOP LAYOUT (UNTOUCHED) ==================== */}
+      <div className="hidden md:flex w-full h-full overflow-hidden">
+        <div
+          style={{ width: `${leftWidth}%` }}
+          className="flex flex-col justify-between bg-[var(--bg-main)] rounded-xl border-r border-[var(--border-light)]/50 gap-2 p-2 shrink-0"
+        >
+          {/* Navbar */}
+          <nav className="flex items-center justify-between rounded-xl px-3 py-2">
+            <div className="flex gap-3 items-center">
+              <img src="./logo.svg" className="h-8" alt="" />
+              <h1 className="text-2xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
+                Lens L<span className="text-lg ">M</span>.
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <Wifi />
+              <StatusBadge />
+            </div>
+          </nav>
+
+          <div className="flex h-full gap-2 w-full overflow-hidden">
+            <SidePanel
+              onNewChat={handleNewChat}
+              selectedVoiceUri={selectedVoiceUri}
+              setSelectedVoiceUri={setSelectedVoiceUri}
+              onResumeChat={handleResumeChat}
+            />
+
+            <div className="relative flex flex-1 flex-col h-full overflow-hidden">
+              <div className="flex-1 overflow-y-auto pb-4 px-0 z-10 space-y-4">
+                {messages.length === 0 ? (
+                  <EmptyChat />
+                ) : (
+                  <div className="flex flex-col gap-4 py-2">
+                    <AnimatePresence>
+                      {messages.map((msg, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, ease: "easeOut" }}
+                          className={`flex flex-col ${
+                            msg.sender === "user" ? "items-end" : "items-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-[85%] px-4 py-2 text-xs ${
+                              msg.sender === "user"
+                                ? "bg-[var(--bg-secondary)] text-justify rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)]/90 leading-relaxed border border-[var(--border-light)]"
+                                : "text-[var(--text-main)] w-full text-[var(--text-main)]/90 leading-relaxed"
+                            }`}
+                          >
+                            <RenderText text={msg.text} />
+
+                            {msg.sender === "bot" && (
+                              <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
+                                <button
+                                  onClick={() => handleCopy(msg.text)}
+                                  className="transition-colors hover:text-[var(--text-main)]"
+                                  title={copied ? "Copied!" : "Copy"}
+                                >
+                                  {copied ? (
+                                    <Check
+                                      size={15}
+                                      strokeWidth={1.8}
+                                      className="text-green-500"
+                                    />
+                                  ) : (
+                                    <Copy size={15} strokeWidth={1.8} />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={handleRegenerate}
+                                  className="transition-colors hover:text-[var(--text-main)]"
+                                  title="Regenerate"
+                                >
+                                  <RotateCw size={15} strokeWidth={1.8} />
+                                </button>
+                                <button
+                                  onClick={() => handleListen(msg.text, index)}
+                                  className={`transition-colors hover:text-[var(--text-main)] ${speakingIndex === index ? "text-[var(--google-blue)]" : ""}`}
+                                  title={
+                                    speakingIndex === index
+                                      ? "Stop reading"
+                                      : "Listen"
+                                  }
+                                >
+                                  {speakingIndex === index ? (
+                                    <VolumeX size={15} strokeWidth={1.8} />
+                                  ) : (
+                                    <Volume2 size={15} strokeWidth={1.8} />
+                                  )}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+
+                    {isLoading && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex flex-col items-start"
+                      >
+                        <ThoughtLine
+                          steps={[
+                            "Reading the question",
+                            "Searching your notes",
+                            "Drafting an answer",
+                          ]}
+                          label="Thinking…"
+                          doneLabel="Thought for"
+                          fontSize={10}
+                          breathPeriod={1.6}
+                          breathDepth={0.5}
+                          settleDuration={350}
+                          settleBlur={2}
+                          collapsible
+                          collapseOnSettle
+                          showTimer
+                        />
+                      </motion.div>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                )}
+              </div>
+
+              <ChatInput
+                message={message}
+                setMessage={setMessage}
+                handleSend={() => handleSend(message)}
+                isLoading={isLoading}
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+                selectedLevel={selectedLevel}
+                setSelectedLevel={setSelectedLevel}
+                isModelDropdownOpen={isModelDropdownOpen}
+                setIsModelDropdownOpen={setIsModelDropdownOpen}
+                isLevelDropdownOpen={isLevelDropdownOpen}
+                setIsLevelDropdownOpen={setIsLevelDropdownOpen}
+                models={models}
+                levels={levels}
+                completedQuestions={completedQuestions}
+                onOpenUpload={() => {
+                  document.getElementById("source-file-input")?.click();
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Draggable Divider */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="w-1.5 cursor-col-resize transition-colors bg-transparent flex items-center justify-center shrink-0"
+          title="Drag to resize panels"
+        >
+          <div className="h-8 w-0.5 rounded-full bg-[var(--border-light)]" />
+        </div>
+
+        {/* Right Panel */}
+        <div className="flex-1 h-full overflow-hidden">
+          <Source
+            chatId={currentChatId}
+            onChatCreated={(newId) => setCurrentChatId(newId)}
+            files={files}
+            setFiles={setFiles}
+          />
+        </div>
+      </div>
+
+      {/* ==================== MOBILE LAYOUT ==================== */}
+      <div className="flex md:hidden flex-col w-full h-full overflow-hidden relative bg-[var(--bg-main)]">
+        {/* Mobile Navbar */}
+        <nav className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-light)]/50 shrink-0">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsMobileSidePanelOpen(true)}
+              className="p-1 rounded-lg text-[var(--text-main)] hover:bg-[var(--bg-secondary)]"
+            >
+              <Menu size={20} />
+            </button>
+            <img src="./logo.svg" className="h-7" alt="" />
+            <h1 className="text-xl text-[var(--text-main)]/80 font-light tracking-tight font-heading">
+              Lens L<span className="text-sm">M</span>.
             </h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Wifi />
             <StatusBadge />
           </div>
         </nav>
 
-        <div className="flex h-full gap-2 w-full overflow-hidden">
-          {/* Side Navigation Panel */}
-          <SidePanel
-            onNewChat={handleNewChat}
-            selectedVoiceUri={selectedVoiceUri}
-            setSelectedVoiceUri={setSelectedVoiceUri}
-            onResumeChat={handleResumeChat}
-          />
-
-          {/* Main Chat Area */}
-          <div className="relative flex flex-1 flex-col h-full overflow-hidden">
-            <div className="flex-1 overflow-y-auto pb-4 px-2 z-10 space-y-4">
-              {messages.length === 0 ? (
-                <EmptyChat />
-              ) : (
-                <div className="flex flex-col gap-4 py-2">
-                  <AnimatePresence>
-                    {messages.map((msg, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className={`flex flex-col ${
-                          msg.sender === "user" ? "items-end" : "items-start"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-[85%] px-4 py-2 text-xs ${
-                            msg.sender === "user"
-                              ? "bg-[var(--bg-secondary)] text-justify rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)]/90 leading-relaxed border border-[var(--border-light)]"
-                              : "text-[var(--text-main)] w-full text-[var(--text-main)]/90 leading-relaxed"
-                          }`}
-                        >
-                          <RenderText text={msg.text} />
-
-                          {msg.sender === "bot" && (
-                            <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
-                              <button
-                                onClick={() => handleCopy(msg.text)}
-                                className="transition-colors hover:text-[var(--text-main)]"
-                                title={copied ? "Copied!" : "Copy"}
-                              >
-                                {copied ? (
-                                  <Check
-                                    size={15}
-                                    strokeWidth={1.8}
-                                    className="text-green-500"
-                                  />
-                                ) : (
-                                  <Copy size={15} strokeWidth={1.8} />
-                                )}
-                              </button>
-                              <button
-                                onClick={handleRegenerate}
-                                className="transition-colors hover:text-[var(--text-main)]"
-                                title="Regenerate"
-                              >
-                                <RotateCw size={15} strokeWidth={1.8} />
-                              </button>
-                              <button
-                                onClick={() => handleListen(msg.text, index)}
-                                className={`transition-colors hover:text-[var(--text-main)] ${speakingIndex === index ? "text-[var(--google-blue)]" : ""}`}
-                                title={
-                                  speakingIndex === index
-                                    ? "Stop reading"
-                                    : "Listen"
-                                }
-                              >
-                                {speakingIndex === index ? (
-                                  <VolumeX size={15} strokeWidth={1.8} />
-                                ) : (
-                                  <Volume2 size={15} strokeWidth={1.8} />
-                                )}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-col items-start"
+        {/* Mobile Chat Area */}
+        <div className="flex-1 overflow-y-auto px-2 py-2 space-y-4">
+          {messages.length === 0 ? (
+            <EmptyChat />
+          ) : (
+            <div className="flex flex-col gap-4 py-2">
+              <AnimatePresence>
+                {messages.map((msg, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className={`flex flex-col ${
+                      msg.sender === "user" ? "items-end" : "items-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[87%] px-2 py-2 text-xs ${
+                        msg.sender === "user"
+                          ? "bg-[var(--bg-secondary)] text-justify rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl text-[var(--text-main)]/90 leading-relaxed border border-[var(--border-light)]"
+                          : "text-[var(--text-main)] w-full text-[var(--text-main)]/90 leading-relaxed"
+                      }`}
                     >
-                      <ThoughtLine
-                        steps={[
-                          "Reading the question",
-                          "Searching your notes",
-                          "Drafting an answer",
-                        ]}
-                        label="Thinking…"
-                        doneLabel="Thought for"
-                        fontSize={10}
-                        breathPeriod={1.6}
-                        breathDepth={0.5}
-                        settleDuration={350}
-                        settleBlur={2}
-                        collapsible
-                        collapseOnSettle
-                        showTimer
-                      />
-                    </motion.div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
+                      <RenderText text={msg.text} />
+                      {msg.sender === "bot" && (
+                        <div className="mt-3 flex items-center gap-3 text-[var(--text-muted)]">
+                          <button
+                            onClick={() => handleCopy(msg.text)}
+                            className="transition-colors hover:text-[var(--text-main)]"
+                          >
+                            {copied ? (
+                              <Check size={15} className="text-green-500" />
+                            ) : (
+                              <Copy size={15} />
+                            )}
+                          </button>
+                          <button
+                            onClick={handleRegenerate}
+                            className="transition-colors hover:text-[var(--text-main)]"
+                          >
+                            <RotateCw size={15} />
+                          </button>
+                          <button
+                            onClick={() => handleListen(msg.text, index)}
+                            className={`transition-colors hover:text-[var(--text-main)] ${speakingIndex === index ? "text-[var(--google-blue)]" : ""}`}
+                          >
+                            {speakingIndex === index ? (
+                              <VolumeX size={15} />
+                            ) : (
+                              <Volume2 size={15} />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {isLoading && (
+                <ThoughtLine
+                  steps={[
+                    "Reading the question",
+                    "Searching your notes",
+                    "Drafting an answer",
+                  ]}
+                  label="Thinking…"
+                  doneLabel="Thought for"
+                  fontSize={10}
+                  collapsible
+                  showTimer
+                />
               )}
+              <div ref={messagesEndMobileRef} />
             </div>
-
-            <ChatInput
-              message={message}
-              setMessage={setMessage}
-              handleSend={() => handleSend(message)}
-              isLoading={isLoading}
-              selectedModel={selectedModel}
-              setSelectedModel={setSelectedModel}
-              selectedLevel={selectedLevel}
-              setSelectedLevel={setSelectedLevel}
-              isModelDropdownOpen={isModelDropdownOpen}
-              setIsModelDropdownOpen={setIsModelDropdownOpen}
-              isLevelDropdownOpen={isLevelDropdownOpen}
-              setIsLevelDropdownOpen={setIsLevelDropdownOpen}
-              models={models}
-              levels={levels}
-              completedQuestions={completedQuestions}
-              onOpenUpload={() => {
-                // Allows attachment icon button to trigger the Source file browser if needed
-                document.getElementById("source-file-input")?.click();
-              }}
-            />
-          </div>
+          )}
         </div>
-      </div>
 
-      {/* Draggable Divider */}
-      <div
-        onMouseDown={handleMouseDown}
-        className="w-1.5 cursor-col-resize transition-colors bg-transparent flex items-center justify-center shrink-0"
-        title="Drag to resize panels"
-      >
-        <div className="h-8 w-0.5 rounded-full bg-[var(--border-light)]" />
-      </div>
+        {/* Mobile Chat Input */}
+        <div className="p-2 shrink-0">
+          <ChatInput
+            message={message}
+            setMessage={setMessage}
+            handleSend={() => handleSend(message)}
+            isLoading={isLoading}
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            selectedLevel={selectedLevel}
+            setSelectedLevel={setSelectedLevel}
+            isModelDropdownOpen={isModelDropdownOpen}
+            setIsModelDropdownOpen={setIsModelDropdownOpen}
+            isLevelDropdownOpen={isLevelDropdownOpen}
+            setIsLevelDropdownOpen={setIsLevelDropdownOpen}
+            models={models}
+            levels={levels}
+            completedQuestions={completedQuestions}
+            onOpenUpload={() => setIsMobileSourceOpen(true)}
+          />
+        </div>
 
-      {/* Right Panel */}
-      <div className="flex-1 h-full overflow-hidden">
-        <Source
-          chatId={currentChatId}
-          onChatCreated={(newId) => setCurrentChatId(newId)}
-          files={files}
-          setFiles={setFiles}
-        />
+        {/* ==================== MOBILE FRAMER MOTION DRAWERS ==================== */}
+        <AnimatePresence>
+          {/* Left Side Sliding Panel */}
+          {isMobileSidePanelOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileSidePanelOpen(false)}
+                className="absolute inset-0 bg-black z-40 md:hidden"
+              />
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 250 }}
+                className="absolute top-0 left-0 bottom-0 w-20 bg-[var(--bg-main)] border-r border-[var(--border-light)] z-50 flex flex-col md:hidden"
+              >
+                <SidePanel
+                  onNewChat={() => {
+                    handleNewChat();
+                    setIsMobileSidePanelOpen(false);
+                  }}
+                  selectedVoiceUri={selectedVoiceUri}
+                  setSelectedVoiceUri={setSelectedVoiceUri}
+                  onResumeChat={handleResumeChat}
+                />
+              </motion.div>
+            </>
+          )}
+
+          {/* Bottom Source Panel Drawer (70% Height) */}
+          {isMobileSourceOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileSourceOpen(false)}
+                className="absolute inset-0 bg-black z-40 md:hidden"
+              />
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: "0%" }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="absolute inset-x-0 bottom-0 top-[30%] bg-[var(--bg-main)] rounded-t-2xl border-t border-[var(--border-light)] z-50 flex flex-col md:hidden shadow-2xl overflow-hidden"
+              >
+                <div className="flex items-center justify-between p-2 border-b border-[var(--border-light)]/50 shrink-0">
+                  <h2 className="text-lg font-light text-[var(--text-main)]/80 font-heading">
+                    Sources
+                  </h2>
+                  <button
+                    onClick={() => setIsMobileSourceOpen(false)}
+                    className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)]"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <Source
+                    chatId={currentChatId}
+                    onChatCreated={(newId) => setCurrentChatId(newId)}
+                    files={files}
+                    setFiles={setFiles}
+                  />
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

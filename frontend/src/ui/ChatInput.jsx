@@ -1,5 +1,6 @@
+// src/ui/ChatInput.jsx
 import React from "react";
-import { Plus, Mic, ArrowUp, ChevronDown, CircleSmall } from "lucide-react";
+import { Plus, Mic, ArrowUp, ChevronDown } from "lucide-react";
 
 const ChatInput = ({
   message,
@@ -16,9 +17,9 @@ const ChatInput = ({
   setIsLevelDropdownOpen,
   models,
   levels,
-  completedQuestions = 0, 
+  completedQuestions = 0,
+  onOpenUpload,
 }) => {
-
   const radius = 8;
   const circumference = 2 * Math.PI * radius;
   const progressPercent = Math.min(Math.max(completedQuestions, 0), 10) / 10;
@@ -48,6 +49,7 @@ const ChatInput = ({
             {/* Add / Attachment Button */}
             <button
               type="button"
+              onClick={onOpenUpload}
               title="Add content"
               className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-main)]"
             >
@@ -100,9 +102,7 @@ const ChatInput = ({
                 }}
                 className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-main)] hover:opacity-80"
               >
-                {/* Partial Circular SVG */}
                 <svg className="w-4 h-4 -rotate-90" viewBox="0 0 20 20">
-                  {/* Background track */}
                   <circle
                     cx="10"
                     cy="10"
@@ -112,7 +112,6 @@ const ChatInput = ({
                     fill="none"
                     className="text-[var(--text-muted)] opacity-30"
                   />
-                  {/* Progress arc colored with --google-green */}
                   <circle
                     cx="10"
                     cy="10"

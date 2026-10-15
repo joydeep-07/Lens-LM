@@ -10,7 +10,6 @@ import {
 import ThemeToggle from "../components/ThemeToggle";
 import PopupModal from "../components/PopupModal";
 import ChatHistory from "./ChatHistory";
-import StarredChats from "./StarredChats";
 import Settings69 from "./Settings";
 import Profile from "./Profile";
 import NewChatButton from "./NewChatButton";
@@ -24,16 +23,15 @@ const SidePanel = ({
   onResumeChat,
 }) => {
   return (
-    <div className="w-12 h-full flex flex-col justify-between items-center py-4">
+    <div className="w-full md:w-12 h-full flex flex-col justify-between items-center py-4 bg-[var(--bg-main)]">
       {/* Top Section: New Chat & Main Navigation */}
-      <div className="flex flex-col items-center gap-4 w-full px-2">
+      <div className="flex flex-col items-center gap-4 w-full px-3 md:px-2">
         {/* New Chat Button */}
         <NewChatButton onClick={onNewChat} />
-        <div className="w-8 h-[1px] bg-[var(--border-light)] my-1" />
+        <div className="w-full md:w-8 h-[1px] bg-[var(--border-light)] my-1" />
 
         {/* Chat List / History Shortcuts */}
         <div className="flex flex-col gap-2 w-full items-center">
-          {/* Reusable Popup for Chat History */}
           <PopupModal
             icon={MessageSquare}
             title="Chat History"
@@ -50,7 +48,6 @@ const SidePanel = ({
             <Files />
           </PopupModal>
 
-          {/* Voice Settings Modal */}
           <PopupModal
             icon={Volume2}
             title="Voice Settings"
@@ -65,7 +62,7 @@ const SidePanel = ({
       </div>
 
       {/* Bottom Section: Theme, Settings, Profile */}
-      <div className="flex flex-col items-center gap-2 w-full px-2">
+      <div className="flex flex-col items-center gap-2 w-full px-3 md:px-2">
         <ThemeToggle />
 
         <PopupModal icon={Settings} title="Settings" ariaLabel="Settings">
