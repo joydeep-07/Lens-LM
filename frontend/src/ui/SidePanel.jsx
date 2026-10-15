@@ -23,19 +23,25 @@ const SidePanel = ({
   onResumeChat,
 }) => {
   return (
-    <div className="w-full md:w-12 h-full flex flex-col justify-between items-center py-4 bg-[var(--bg-main)]">
+    <div className="w-full md:w-12 h-full flex flex-col justify-between items-start md:items-center py-4 bg-[var(--bg-main)]">
       {/* Top Section: New Chat & Main Navigation */}
-      <div className="flex flex-col items-center gap-4 w-full px-3 md:px-2">
+      <div className="flex flex-col items-start md:items-center gap-4 w-full px-3 md:px-2">
         {/* New Chat Button */}
-        <NewChatButton onClick={onNewChat} />
+        <NewChatButton
+          onClick={onNewChat}
+          showName={true}
+          hideNameOnLaptop={true}
+        />
         <div className="w-full md:w-8 h-[1px] bg-[var(--border-light)] my-1" />
 
         {/* Chat List / History Shortcuts */}
-        <div className="flex flex-col gap-2 w-full items-center">
+        <div className="flex flex-col gap-2 w-full items-start md:items-center">
           <PopupModal
             icon={MessageSquare}
             title="Chat History"
             ariaLabel="Chat History"
+            showName={true}
+            hideNameOnLaptop={true}
           >
             <ChatHistory onResumeChat={onResumeChat} />
           </PopupModal>
@@ -44,6 +50,8 @@ const SidePanel = ({
             icon={LayoutDashboard}
             title="Documents"
             ariaLabel="Documents"
+            showName={true}
+            hideNameOnLaptop={true}
           >
             <Files />
           </PopupModal>
@@ -52,6 +60,8 @@ const SidePanel = ({
             icon={Volume2}
             title="Voice Settings"
             ariaLabel="Voice Settings"
+            showName={true}
+            hideNameOnLaptop={true}
           >
             <VoiceSelector
               selectedVoiceUri={selectedVoiceUri}
@@ -62,14 +72,26 @@ const SidePanel = ({
       </div>
 
       {/* Bottom Section: Theme, Settings, Profile */}
-      <div className="flex flex-col items-center gap-2 w-full px-3 md:px-2">
-        <ThemeToggle />
+      <div className="flex flex-col items-start md:items-center gap-2 w-full px-3 md:px-2">
+        <ThemeToggle showName={true} hideNameOnLaptop={true} />
 
-        <PopupModal icon={Settings} title="Settings" ariaLabel="Settings">
+        <PopupModal
+          icon={Settings}
+          title="Settings"
+          ariaLabel="Settings"
+          showName={true}
+          hideNameOnLaptop={true}
+        >
           <Settings69 />
         </PopupModal>
 
-        <PopupModal icon={User} title="Profile" ariaLabel="Profile">
+        <PopupModal
+          icon={User}
+          title="Profile"
+          ariaLabel="Profile"
+          showName={true}
+          hideNameOnLaptop={true}
+        >
           <Profile />
         </PopupModal>
       </div>

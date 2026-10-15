@@ -575,17 +575,30 @@ const ChatBot = () => {
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                className="absolute top-0 left-0 bottom-0 w-20 bg-[var(--bg-main)] border-r border-[var(--border-light)] z-50 flex flex-col md:hidden"
+                className="absolute top-0 left-0 bottom-0 w-54 bg-[var(--bg-main)] border-r border-[var(--border-light)]/50 z-50 flex flex-col md:hidden shadow-2xl"
               >
-                <SidePanel
-                  onNewChat={() => {
-                    handleNewChat();
-                    setIsMobileSidePanelOpen(false);
-                  }}
-                  selectedVoiceUri={selectedVoiceUri}
-                  setSelectedVoiceUri={setSelectedVoiceUri}
-                  onResumeChat={handleResumeChat}
-                />
+                <div className="flex items-center justify-between p-3 border-b border-[var(--border-light)]/50 shrink-0">
+                  <h2 className="text-lg font-light text-[var(--text-main)]/85 font-heading">
+                    Menu
+                  </h2>
+                  <button
+                    onClick={() => setIsMobileSidePanelOpen(false)}
+                    className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)]"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  <SidePanel
+                    onNewChat={() => {
+                      handleNewChat();
+                      setIsMobileSidePanelOpen(false);
+                    }}
+                    selectedVoiceUri={selectedVoiceUri}
+                    setSelectedVoiceUri={setSelectedVoiceUri}
+                    onResumeChat={handleResumeChat}
+                  />
+                </div>
               </motion.div>
             </>
           )}

@@ -6,6 +6,8 @@ const PopupModal = ({
   icon: Icon,
   title = "Modal",
   ariaLabel = "Open modal",
+  showName = false,
+  hideNameOnLaptop = false,
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +51,7 @@ const PopupModal = ({
     }
   };
 
-  // Listen for external close modal events 
+  // Listen for external close modal events
   useEffect(() => {
     const handleExternalClose = () => {
       if (isOpen) {
@@ -80,15 +82,24 @@ const PopupModal = ({
 
   return (
     <>
-      <div>
+      <div className="w-full">
         <button
           type="button"
           onClick={toggleModal}
           title={title}
           aria-label={ariaLabel}
-          className="p-2.5 rounded-sm text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors"
+          className="w-full p-2.5 rounded-sm text-[var(--text-secondary)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] transition-colors flex items-center justify-start md:justify-center gap-2"
         >
-          {Icon && <Icon size={16} />}
+          {Icon && <Icon size={16} className="shrink-0" />}
+          {showName && (
+            <span
+              className={`text-sm font-medium ${
+                hideNameOnLaptop ? "lg:hidden" : "hidden lg:inline"
+              }`}
+            >
+              {title}
+            </span>
+          )}
         </button>
       </div>
 

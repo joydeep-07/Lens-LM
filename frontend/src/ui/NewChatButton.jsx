@@ -1,17 +1,31 @@
+// src/ui/NewChatButton.jsx
 import { CircleFadingPlus } from "lucide-react";
 import React from "react";
 
-const NewChatButton = ({ onClick }) => {
+const NewChatButton = ({
+  onClick,
+  showName = true,
+  hideNameOnLaptop = false,
+}) => {
   return (
-    <div>
+    <div className="w-full">
       <button
         type="button"
         onClick={onClick}
         title="New chat"
         aria-label="New chat"
-        className="rounded-lg p-2 text-[var(--text-secondary)] hover:text-[var(--text-main)] transition-colors hover:bg-[var(--bg-secondary)]"
+        className="w-full rounded-lg p-2.5 text-[var(--text-secondary)] flex items-center justify-start md:justify-center gap-2 hover:text-[var(--text-main)] transition-colors hover:bg-[var(--bg-card)]"
       >
-        <CircleFadingPlus size={19} strokeWidth={1.8} />
+        <CircleFadingPlus size={16} strokeWidth={1.8} className="shrink-0" />
+        {showName && (
+          <span
+            className={`text-sm font-medium ${
+              hideNameOnLaptop ? "lg:hidden" : "hidden lg:inline"
+            }`}
+          >
+            New Chat
+          </span>
+        )}
       </button>
     </div>
   );
