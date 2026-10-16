@@ -10,7 +10,9 @@ import {
   Menu,
   X,
   Logs,
+  User,
 } from "lucide-react";
+import {Link} from 'react-router-dom'
 import { motion, AnimatePresence, easeInOut } from "framer-motion";
 import api from "../api/axios";
 import endpoints from "../api/endpoints";
@@ -454,8 +456,11 @@ const ChatBot = () => {
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <Wifi />
-            <StatusBadge />
+            <NewChatButton onClick={handleNewChat} />
+            <Link to={"/profile"} >
+              <User size={18} strokeWidth={1.8} className="shrink-0 text-[var(--text-secondary)] " />
+            </Link>
+            {/* <StatusBadge /> */}
           </div>
         </nav>
 

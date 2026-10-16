@@ -120,7 +120,9 @@ const Profile = () => {
           ))}
         </nav>
 
-        <Logout />
+        <div className="p-2">
+          <Logout />
+        </div>
       </aside>
 
       {/* Main Content Area */}

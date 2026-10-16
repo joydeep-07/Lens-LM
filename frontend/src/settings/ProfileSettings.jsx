@@ -85,8 +85,6 @@ const ProfileSettings = () => {
       try {
         const response = await api.get(endpoints.getMe);
 
-        // Support common response formats:
-        // { user: {...} } or { ...user }
         const user = response.data?.user ?? response.data;
 
         if (!user || !user.email) {
@@ -107,7 +105,6 @@ const ProfileSettings = () => {
         setFullName(loadedName);
         setUsername(loadedUsername);
 
-        // Store initial values for change detection
         initialValuesRef.current = {
           fullName: loadedName,
           username: loadedUsername,
@@ -116,7 +113,6 @@ const ProfileSettings = () => {
           emailAlerts: true,
         };
 
-        // Populate Redux and localStorage with the fetched profile.
         dispatch(
           updateUser({
             ...user,
@@ -128,7 +124,6 @@ const ProfileSettings = () => {
       } catch (err) {
         if (cancelled) return;
 
-        // Use existing Redux data if the request fails.
         if (storedUser?.email) {
           const normalizedEmail = storedUser.email.trim().toLowerCase();
           const defaults = getDefaultProfile(normalizedEmail);
@@ -171,7 +166,7 @@ const ProfileSettings = () => {
     return () => {
       cancelled = true;
     };
-  }, [dispatch]); // Fetch once when the component mounts.
+  }, [dispatch]);
 
   // Save profile changes to the backend.
   const handleSaveProfile = async (e) => {
@@ -203,7 +198,6 @@ const ProfileSettings = () => {
     setSaving(true);
 
     try {
-      // Assumes your backend updates profiles using PATCH /auth/profile.
       const response = await api.patch(endpoints.updateProfile, {
         name: trimmedName,
         username: trimmedUsername,
@@ -212,7 +206,6 @@ const ProfileSettings = () => {
       const updatedUser =
         response.data?.user ?? response.data?.profile ?? response.data;
 
-      // Update Redux and localStorage immediately.
       dispatch(
         updateUser({
           ...updatedUser,
@@ -228,7 +221,6 @@ const ProfileSettings = () => {
       setFullName(savedName);
       setUsername(savedUsername);
 
-      // Reset initial values reference after successful save
       initialValuesRef.current = {
         fullName: savedName,
         username: savedUsername,
@@ -281,13 +273,14 @@ const ProfileSettings = () => {
       {/* Main Content */}
       <main className="relative flex h-full min-w-0 flex-1 flex-col overflow-y-auto">
         {activeTab === "public-profile" ? (
-          <form onSubmit={handleSaveProfile} className="space-y-5 p-7">
+          <form onSubmit={handleSaveProfile} className="space-y-5 p-4 sm:p-7">
             {/* Header with Conditional Save Button at the top */}
-            <div className="flex items-center justify-between gap-5">
-              <div className="flex items-center gap-5 min-w-0">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+              <div className="flex items-center gap-4 sm:gap-5 min-w-0">
                 <div className="group relative shrink-0">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-[var(--border-light)]/40 text-[var(--text-main)]/50 shadow-inner">
-                    <User size={26} />
+                  <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full border-2 border-[var(--border-light)]/40 text-[var(--text-main)]/50 shadow-inner">
+                    <User size={24} className="sm:hidden" />
+                    <User size={26} className="hidden sm:block" />
                   </div>
 
                   <button
@@ -300,11 +293,11 @@ const ProfileSettings = () => {
                 </div>
 
                 <div className="min-w-0">
-                  <h2 className="flex items-center gap-2 text-base font-bold">
+                  <h2 className="flex items-center gap-2 text-sm sm:text-base font-bold">
                     <span className="truncate">{fullName || "Your name"}</span>
                     <BadgeCheck
                       size={14}
-                      className="shrink-0 text-[var(--google-blue)] "
+                      className="shrink-0 text-[var(--google-blue)]"
                     />
                   </h2>
 
@@ -321,7 +314,7 @@ const ProfileSettings = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xs bg-green-600 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-green-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full sm:w-auto inline-flex shrink-0 items-center justify-center gap-2 rounded-xs bg-green-600 px-4 py-2.5 sm:py-2 text-xs font-semibold text-white transition-all hover:bg-green-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {saving ? (
                     <LoaderCircle size={15} className="animate-spin" />
@@ -355,14 +348,14 @@ const ProfileSettings = () => {
             ) : (
               <>
                 {/* Basic Information */}
-                <section className="space-y-5">
+                <section className="space-y-4 sm:space-y-5">
                   <h3 className="text-sm font-bold tracking-wide">
                     Basic Information
                   </h3>
 
                   {/* Email */}
-                  <div className="flex items-start justify-between gap-4 text-xs">
-                    <div className="w-1/3 shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-4 text-xs">
+                    <div className="w-full sm:w-1/3 shrink-0">
                       <div className="font-medium">Email address</div>
                       <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
                         Your registered email address.
@@ -374,13 +367,13 @@ const ProfileSettings = () => {
                       value={email}
                       readOnly
                       disabled
-                      className="w-2/3 cursor-not-allowed rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2.5 text-xs text-[var(--text-main)]/70 opacity-80 outline-none"
+                      className="w-full sm:w-2/3 cursor-not-allowed rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2.5 text-xs text-[var(--text-main)]/70 opacity-80 outline-none"
                     />
                   </div>
 
                   {/* Display Name */}
-                  <div className="flex items-start justify-between gap-4 text-xs">
-                    <div className="w-1/3 shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-4 text-xs">
+                    <div className="w-full sm:w-1/3 shrink-0">
                       <div className="font-medium">Name</div>
                       <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
                         The name displayed on your profile.
@@ -397,20 +390,20 @@ const ProfileSettings = () => {
                       maxLength={80}
                       placeholder="Enter your name"
                       autoComplete="name"
-                      className="w-2/3 rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2.5 text-xs transition-colors focus:border-green-500/50 focus:outline-none"
+                      className="w-full sm:w-2/3 rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 py-2.5 text-xs transition-colors focus:border-green-500/50 focus:outline-none"
                     />
                   </div>
 
                   {/* Username */}
-                  <div className="flex items-start justify-between gap-4 text-xs">
-                    <div className="w-1/3 shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-4 text-xs">
+                    <div className="w-full sm:w-1/3 shrink-0">
                       <div className="font-medium">Username</div>
                       <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
                         3–30 letters, numbers, or underscores.
                       </div>
                     </div>
 
-                    <div className="w-2/3">
+                    <div className="w-full sm:w-2/3">
                       <div className="flex items-center rounded-xs border border-[var(--border-light)]/20 bg-[var(--bg-input,rgba(255,255,255,0.04))] px-3 focus-within:border-green-500/50">
                         <span className="text-sm text-[var(--text-main)]/70">
                           @
@@ -441,12 +434,12 @@ const ProfileSettings = () => {
                 <hr className="border-[var(--border-light)]/20" />
 
                 {/* Privacy & Visibility */}
-                <section className="space-y-5">
+                <section className="space-y-4 sm:space-y-5">
                   <h3 className="text-sm font-bold tracking-wide">
                     Privacy & Visibility
                   </h3>
 
-                  <div className="flex items-start justify-between gap-4 text-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 text-xs">
                     <div>
                       <div className="font-medium">Profile visibility</div>
                       <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
@@ -454,18 +447,20 @@ const ProfileSettings = () => {
                       </div>
                     </div>
 
-                    <SegmentedControl
-                      options={["Public", "Team", "Private"]}
-                      value={visibility}
-                      onChange={(val) => {
-                        setVisibility(val);
-                        setSuccess("");
-                      }}
-                      layoutId="profileVisibilityPill"
-                    />
+                    <div className="w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                      <SegmentedControl
+                        options={["Public", "Team", "Private"]}
+                        value={visibility}
+                        onChange={(val) => {
+                          setVisibility(val);
+                          setSuccess("");
+                        }}
+                        layoutId="profileVisibilityPill"
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-start justify-between gap-6 text-xs">
+                  <div className="flex items-center justify-between gap-6 text-xs">
                     <div>
                       <div className="font-medium">Display online status</div>
                       <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
@@ -482,7 +477,7 @@ const ProfileSettings = () => {
                     />
                   </div>
 
-                  <div className="flex items-start justify-between gap-6 text-xs">
+                  <div className="flex items-center justify-between gap-6 text-xs">
                     <div>
                       <div className="font-medium">
                         Activity email summaries
@@ -507,11 +502,11 @@ const ProfileSettings = () => {
           </form>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <div className=" p-4">
+            <div className="p-4">
               <Shield size={24} className="text-[var(--text-secondary)]" />
             </div>
 
-            <h3 className="text-md font-semibold text-[var(--text-main)]/70 ">
+            <h3 className="text-md font-semibold text-[var(--text-main)]/70">
               {navigationGroups
                 .flatMap((group) => group.items)
                 .find((item) => item.id === activeTab)?.label || "Settings"}

@@ -32,7 +32,8 @@ const Logout = () => {
       disabled={loading}
       className="
         group inline-flex items-center justify-center gap-2
-        m-4 rounded-sm
+      rounded-sm 
+        w-full
         bg-[var(--google-red)] px-4 py-2.5
         text-xs font-semibold text-white
         transition-all duration-200
