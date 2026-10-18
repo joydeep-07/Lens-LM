@@ -1,44 +1,36 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
+const BASE_URL = "http://localhost:5000/api";
 
 const endpoints = {
   // Health
-  health: "/health",
+  health: `${BASE_URL}/health`,
 
   // Authentication
-  sendOTP: "/auth/send-otp",
-  verifyOTP: "/auth/verify-otp",
-  getMe: "/auth/me",
-  updateProfile: "/auth/profile",
-  logout: "/auth/logout",
+  sendOTP: `${BASE_URL}/auth/send-otp`,
+  verifyOTP: `${BASE_URL}/auth/verify-otp`,
+  getMe: `${BASE_URL}/auth/me`,
+  updateProfile: `${BASE_URL}/auth/profile`,
+  logout: `${BASE_URL}/auth/logout`,
 
   // Chats
-  createChat: "/auth/chats",
-  getChats: "/auth/chats",
-
+  createChat: `${BASE_URL}/auth/chats`,
+  getChats: `${BASE_URL}/auth/chats`,
+  // In endpoints.js
   renameChat: (chatId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}/rename`,
-
-  getChat: (chatId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}`,
-
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/rename`,
+  getChat: (chatId) => `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,
   deleteChat: (chatId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}`,
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,
 
   sendMessage: (chatId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}/messages`,
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/messages`,
 
   // Files
   uploadFiles: (chatId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}/files`,
-
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files`,
   downloadFile: (chatId, fileId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}/download`,
-
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}/download`,
   deleteFile: (chatId, fileId) =>
-    `/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}`,
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}`,
 };
-
-
 
 export default endpoints;

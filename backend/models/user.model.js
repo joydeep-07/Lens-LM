@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       maxlength: 254,
+      index: true,
     },
 
     isEmailVerified: {
@@ -63,6 +64,8 @@ const userSchema = new mongoose.Schema(
     strict: "throw",
   },
 );
+
+userSchema.index({ email: 1 }, { unique: true });
 
 const User = mongoose.model("User", userSchema);
 
