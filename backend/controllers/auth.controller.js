@@ -239,7 +239,13 @@ export const sendOTP = async (req, res) => {
 
       await user.save();
 
-      console.error("Email delivery failed:", error.message);
+      console.error("Email delivery failed:", {
+        message: error.message,
+        code: error.code,
+        command: error.command,
+        responseCode: error.responseCode,
+        response: error.response,
+      });
 
       return res.status(503).json({
         success: false,
