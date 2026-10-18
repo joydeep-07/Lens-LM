@@ -14,19 +14,28 @@ const StatusBadge = () => {
   const backdropRef = useRef(null);
 
   useEffect(() => {
-    const checkHealth = async () => {
-      try {
-        const response = await api.get(endpoints.health);
-        if (response.data.success) {
-          setIsHealthy(true);
-        } else {
-          setIsHealthy(false);
-        }
-      } catch (error) {
-        console.error("Health check failed:", error);
-        setIsHealthy(false);
-      }
-    };
+   const checkHealth = async () => {
+     try {
+       const response = await api.get(endpoints.health);
+
+       setIsHealthy(
+         response.status >= 200 &&
+           response.status < 300 &&
+           response.data?.success !== false,
+       );
+     } catch (error) {
+       console.error("Health check failed:", {
+         message: error.message,
+         url: error.config?.baseURL
+           ? `${error.config.baseURL}${error.config.url || ""}`
+           : error.config?.url,
+         status: error.response?.status,
+         data: error.response?.data,
+       });
+
+       setIsHealthy(false);
+     }
+   };
 
     checkHealth();
 

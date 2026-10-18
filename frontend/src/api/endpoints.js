@@ -1,36 +1,44 @@
-const BASE_URL = "https://lens-lm.onrender.com/api" ;
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 
 const endpoints = {
   // Health
-  health: `${BASE_URL}/health`,
+  health: "/health",
 
   // Authentication
-  sendOTP: `${BASE_URL}/auth/send-otp`,
-  verifyOTP: `${BASE_URL}/auth/verify-otp`,
-  getMe: `${BASE_URL}/auth/me`,
-  updateProfile: `${BASE_URL}/auth/profile`,
-  logout: `${BASE_URL}/auth/logout`,
+  sendOTP: "/auth/send-otp",
+  verifyOTP: "/auth/verify-otp",
+  getMe: "/auth/me",
+  updateProfile: "/auth/profile",
+  logout: "/auth/logout",
 
   // Chats
-  createChat: `${BASE_URL}/auth/chats`,
-  getChats: `${BASE_URL}/auth/chats`,
-  // In endpoints.js
+  createChat: "/auth/chats",
+  getChats: "/auth/chats",
+
   renameChat: (chatId) =>
-    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/rename`,
-  getChat: (chatId) => `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,
+    `/auth/chats/${encodeURIComponent(chatId)}/rename`,
+
+  getChat: (chatId) =>
+    `/auth/chats/${encodeURIComponent(chatId)}`,
+
   deleteChat: (chatId) =>
-    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,
+    `/auth/chats/${encodeURIComponent(chatId)}`,
 
   sendMessage: (chatId) =>
-    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/messages`,
+    `/auth/chats/${encodeURIComponent(chatId)}/messages`,
 
   // Files
   uploadFiles: (chatId) =>
-    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files`,
+    `/auth/chats/${encodeURIComponent(chatId)}/files`,
+
   downloadFile: (chatId, fileId) =>
-    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}/download`,
+    `/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}/download`,
+
   deleteFile: (chatId, fileId) =>
-    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}`,
+    `/auth/chats/${encodeURIComponent(chatId)}/files/${encodeURIComponent(fileId)}`,
 };
+
+
 
 export default endpoints;
