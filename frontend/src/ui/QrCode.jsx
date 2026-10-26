@@ -96,7 +96,10 @@ const QrCode = () => {
     <>
       {/* Trigger Button */}
       <button onClick={() => setIsOpen(true)} className="">
-        <Coffee size={18} className="text-[var(--text-secondary)] hover:text-[var(--google-green)] " />
+        <Coffee
+          size={18}
+          className="text-[var(--text-secondary)] hover:text-[var(--google-green)] "
+        />
       </button>
 
       {/* Modal Backdrop & Centered Popup */}
@@ -155,12 +158,18 @@ const QrCode = () => {
                 fgColor="currentColor"
                 title="Scan to pay Joydeep using UPI"
                 className="block h-auto w-full max-w-[248px] text-[var(--text-main)]"
+                imageSettings={{
+                  src: "/qr_logo.svg",
+                  height: 40,
+                  width: 40,
+                  excavate: true, // clears the QR modules behind the logo so it stays scannable
+                }}
               />
             </div>
 
             {/* Scan Instruction */}
             <p className="mt-4 text-xs font-medium tracking-wide text-[var(--text-muted)]">
-              Scan with any UPI app 
+              Scan with any UPI app
             </p>
 
             {/* UPI ID Copy Pill */}
