@@ -1,4 +1,9 @@
-const BASE_URL = "http://localhost:5000/api";
+// In development: falls back to local backend.
+// In production (Netlify): VITE_API_URL is configured in Netlify to
+// https://lens-lm.onrender.com/api
+const rawBaseUrl =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BASE_URL = rawBaseUrl.replace(/\/+$/, "");
 
 const endpoints = {
   // Health

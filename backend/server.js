@@ -15,7 +15,10 @@ import { warmUpEmbeddingModel } from "./services/rag.service.js";
 const app = express();
 
 const PORT = Number(process.env.PORT || 5000);
-const CLIENT_URL = process.env.CLIENT_URL;
+const rawClientUrl = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.trim().replace(/\/+$/, "")
+  : "";
+const CLIENT_URL = rawClientUrl;
 const isProduction = process.env.NODE_ENV === "production";
 
 // ----------------------------------------------------
@@ -50,10 +53,7 @@ if (
 try {
   const clientUrl = new URL(CLIENT_URL);
 
-  if (
-    !["http:", "https:"].includes(clientUrl.protocol) ||
-    clientUrl.origin !== CLIENT_URL
-  ) {
+  if (!["http:", "https:"].includes(clientUrl.protocol)) {
     throw new Error();
   }
 
@@ -62,7 +62,7 @@ try {
   }
 } catch {
   throw new Error(
-    "CLIENT_URL must be a valid origin, such as http://localhost:5173, and must use HTTPS in production.",
+    "CLIENT_URL must be a valid origin, such as https://lenslm.netlify.app, and must use HTTPS in production.",
   );
 }
 
@@ -76,17 +76,39 @@ if (isProduction) {
 
 app.disable("x-powered-by");
 
+// Allow cross-origin requests from the Netlify frontend to read API resources
 app.use(
   helmet({
     crossOriginResourcePolicy: {
-      policy: "same-site",
+      policy: "cross-origin",
     },
   }),
 );
 
+const allowedOrigins = new Set(
+  [
+    CLIENT_URL,
+    "https://lenslm.netlify.app",
+    "http://localhost:5173",
+  ].filter(Boolean),
+);
+
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (such as mobile apps, curl, or server-to-server)
+      if (!origin) return callback(null, true);
+
+      if (
+        allowedOrigins.has(origin) ||
+        /^https:\/\/[a-zA-Z0-9_-]+\.netlify\.app$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      console.warn(`[CORS] Rejected request from origin: ${origin}`);
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "X-CSRF-Token"],
@@ -269,6 +291,7 @@ const startServer = async () => {
     const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`Allowed CORS origins:`, Array.from(allowedOrigins).join(", "));
     });
 
     server.on("error", (error) => {

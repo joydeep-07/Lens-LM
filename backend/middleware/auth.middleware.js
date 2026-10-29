@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import User from "../models/user.model.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
@@ -35,8 +37,8 @@ const authMiddleware = async (req, res, next) => {
     if (!user || !user.isEmailVerified) {
       res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
       });
 
@@ -57,8 +59,8 @@ const authMiddleware = async (req, res, next) => {
     ) {
       res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
       });
 
