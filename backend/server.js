@@ -10,7 +10,6 @@ import multer from "multer";
 
 import authRoutes from "./routes/auth.route.js";
 import chatRoutes from "./routes/chat.route.js";
-import { warmUpEmbeddingModel } from "./services/rag.service.js";
 
 const app = express();
 
@@ -44,8 +43,8 @@ const hasEmailConfig =
   Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
 if (!hasEmailConfig) {
-  throw new Error(
-    "Missing email configuration: provide RESEND_API_KEY (recommended on Render Free Tier), BREVO_API_KEY, or EMAIL_USER and EMAIL_PASS.",
+  console.warn(
+    "[Email] Warning: No email provider configured. Please provide RESEND_API_KEY (recommended on Render Free Tier), BREVO_API_KEY, or EMAIL_USER and EMAIL_PASS.",
   );
 }
 
@@ -63,15 +62,17 @@ try {
   const clientUrl = new URL(CLIENT_URL);
 
   if (!["http:", "https:"].includes(clientUrl.protocol)) {
-    throw new Error();
+    console.warn(`[Config] Unusual CLIENT_URL protocol: ${clientUrl.protocol}`);
   }
 
   if (isProduction && clientUrl.protocol !== "https:") {
-    throw new Error();
+    console.warn(
+      `[Config] Notice: CLIENT_URL (${CLIENT_URL}) does not use HTTPS in production. Consider updating it to https://lenslm.netlify.app`,
+    );
   }
 } catch {
-  throw new Error(
-    "CLIENT_URL must be a valid origin, such as https://lenslm.netlify.app, and must use HTTPS in production.",
+  console.warn(
+    `[Config] Notice: Could not parse CLIENT_URL (${CLIENT_URL}) as URL. CORS will fall back to allowed list.`,
   );
 }
 
@@ -186,13 +187,36 @@ app.use("/api/auth/send-otp", otpRequestLimiter);
 app.use("/api/auth/verify-otp", otpVerifyLimiter);
 
 // ----------------------------------------------------
-// Health check.
+// Health check & Diagnostic endpoints.
 // ----------------------------------------------------
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "API is running.",
+    environment: process.env.NODE_ENV || "development",
+  });
+});
+
+app.get("/api/auth/email-status", (req, res) => {
+  const provider = process.env.RESEND_API_KEY
+    ? "resend"
+    : process.env.BREVO_API_KEY
+      ? "brevo"
+      : process.env.EMAIL_USER
+        ? "smtp"
+        : "none";
+
+  res.status(200).json({
+    success: true,
+    activeProvider: provider,
+    resendConfigured: Boolean(process.env.RESEND_API_KEY),
+    brevoConfigured: Boolean(process.env.BREVO_API_KEY),
+    smtpConfigured: Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS),
+    notice:
+      isProduction && provider === "smtp"
+        ? "Render Free Tier blocks outbound SMTP ports (25, 465, 587). Please configure RESEND_API_KEY in the Render dashboard to deliver emails via HTTPS."
+        : "Email provider configured.",
   });
 });
 
@@ -292,10 +316,6 @@ const startServer = async () => {
     });
 
     console.log("MongoDB connected successfully.");
-
-    // Pre-load the embedding model in the background so it's ready
-    // before the first file upload arrives (avoids a 30-second delay).
-    warmUpEmbeddingModel();
 
     const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
