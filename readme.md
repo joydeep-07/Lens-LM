@@ -87,9 +87,9 @@ Open [http://localhost:5173](http://localhost:5173).
 ### `backend/.env`
 
 ```env
-# ── Server ──────────────────────────────────────────
+
 PORT=5000
-NODE_ENV=development          # "production" in prod
+NODE_ENV=development          # "production" in production
 CLIENT_URL=http://localhost:5173  # Must match frontend origin exactly
 MONGO_URI=
 
@@ -108,7 +108,7 @@ CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=000000000000000
 CLOUDINARY_API_SECRET=your-api-secret
 
-GROQ_API_KEY=gsk_...
+GROQ_API_KEY=your-api-secret
 
 RAG_EMBEDDING_MODEL=Xenova/all-MiniLM-L6-v2
 RAG_CHUNK_SIZE=1000           # Characters per chunk
