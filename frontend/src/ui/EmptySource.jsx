@@ -11,7 +11,7 @@ const EmptySource = () => {
        
 
         {/* Document Skeleton */}
-        <div className="rounded-2xl shadow-sm">
+        <div className="rounded-2xl">
           
           <div className="space-y-3">
             {" "}
