@@ -29,8 +29,6 @@ const requiredEnvironmentVariables = [
   "MONGO_URI",
   "JWT_SECRET",
   "OTP_SECRET",
-  "EMAIL_USER",
-  "EMAIL_PASS",
   "CLIENT_URL",
 ];
 
@@ -38,6 +36,17 @@ for (const variable of requiredEnvironmentVariables) {
   if (!process.env[variable]) {
     throw new Error(`Missing required environment variable: ${variable}`);
   }
+}
+
+const hasEmailConfig =
+  Boolean(process.env.RESEND_API_KEY) ||
+  Boolean(process.env.BREVO_API_KEY) ||
+  Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+if (!hasEmailConfig) {
+  throw new Error(
+    "Missing email configuration: provide RESEND_API_KEY (recommended on Render Free Tier), BREVO_API_KEY, or EMAIL_USER and EMAIL_PASS.",
+  );
 }
 
 if (
