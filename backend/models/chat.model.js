@@ -109,6 +109,12 @@ const chatSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+
+    pinned: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -121,6 +127,8 @@ chatSchema.index({
   user: 1,
   updatedAt: -1,
 });
+
+chatSchema.index({ user: 1, pinned: -1, updatedAt: -1 });
 
 const Chat = mongoose.model("Chat", chatSchema);
 

@@ -14,9 +14,10 @@ const endpoints = {
   // Chats
   createChat: `${BASE_URL}/auth/chats`,
   getChats: `${BASE_URL}/auth/chats`,
-  // In endpoints.js
   renameChat: (chatId) =>
     `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/rename`,
+  pinChat: (chatId) =>
+    `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}/pin`,
   getChat: (chatId) => `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,
   deleteChat: (chatId) =>
     `${BASE_URL}/auth/chats/${encodeURIComponent(chatId)}`,

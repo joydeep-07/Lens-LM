@@ -87,14 +87,26 @@ const ChatHistory = ({ onResumeChat }) => {
   }, [selectedChat]);
 
   // Toggle pin
-  const togglePin = (id, e) => {
+  const togglePin = async (id, e) => {
     e.stopPropagation();
 
+    // Optimistic update
     setChats((prevChats) =>
       prevChats.map((chat) =>
         chat.id === id ? { ...chat, pinned: !chat.pinned } : chat,
       ),
     );
+    try {
+      await api.patch(endpoints.pinChat(id));
+    } catch (error) {
+      console.error("Failed to pin/unpin chat:", error);
+      // Revert on failure
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === id ? { ...chat, pinned: !chat.pinned } : chat,
+        ),
+      );
+    }
   };
 
   // Trigger modal open instead of immediate deletion
@@ -241,10 +253,16 @@ const ChatHistory = ({ onResumeChat }) => {
             <div className="text-center py-12 text-xs text-[var(--text-muted)]">
               No conversations found
             </div>
-          ) : (
-            filteredChats.map((chat) => {
-              const isSelected = selectedChat === chat.id;
+          ) : (() => {
+            const pinnedChats = filteredChats.filter((c) => c.pinned);
+            const unpinnedChats = filteredChats.filter((c) => !c.pinned);
+            const showSections =
+              filterTab === "All" &&
+              pinnedChats.length > 0 &&
+              unpinnedChats.length > 0;
 
+            const renderChatItem = (chat) => {
+              const isSelected = selectedChat === chat.id;
               return (
                 <div
                   key={chat.id}
@@ -273,7 +291,7 @@ const ChatHistory = ({ onResumeChat }) => {
                     </span>
 
                     <div className="flex items-center gap-1 shrink-0">
-                      {/* Rename chat button - visible only on active/selected tab */}
+                      {/* Rename chat button */}
                       <div
                         className={`flex items-center transition-opacity ${
                           isSelected
@@ -288,19 +306,11 @@ const ChatHistory = ({ onResumeChat }) => {
                         />
                       </div>
 
-                      {/* Pin button - visible if pinned or active */}
+                      {/* Pin button */}
                       <button
                         onClick={(e) => togglePin(chat.id, e)}
-                        title={
-                          chat.pinned
-                            ? "Unpin conversation"
-                            : "Pin conversation"
-                        }
-                        aria-label={
-                          chat.pinned
-                            ? "Unpin conversation"
-                            : "Pin conversation"
-                        }
+                        title={chat.pinned ? "Unpin conversation" : "Pin conversation"}
+                        aria-label={chat.pinned ? "Unpin conversation" : "Pin conversation"}
                         className={`p-1 rounded hover:bg-[var(--bg-secondary)] transition-opacity ${
                           chat.pinned || isSelected
                             ? "opacity-100"
@@ -315,7 +325,7 @@ const ChatHistory = ({ onResumeChat }) => {
                         <Pin size={14} />
                       </button>
 
-                      {/* Delete button - visible only on active/selected tab */}
+                      {/* Delete button */}
                       <button
                         onClick={(e) => promptDeleteChat(chat.id, e)}
                         title="Delete conversation"
@@ -346,8 +356,33 @@ const ChatHistory = ({ onResumeChat }) => {
                   </div>
                 </div>
               );
-            })
-          )}
+            };
+
+            return (
+              <>
+                {pinnedChats.length > 0 && (
+                  <>
+                    {showSections && (
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] px-1 pt-1 pb-0.5 select-none">
+                        Pinned
+                      </p>
+                    )}
+                    {pinnedChats.map(renderChatItem)}
+                  </>
+                )}
+                {unpinnedChats.length > 0 && (
+                  <>
+                    {showSections && (
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] px-1 pt-2 pb-0.5 select-none">
+                        Recent
+                      </p>
+                    )}
+                    {unpinnedChats.map(renderChatItem)}
+                  </>
+                )}
+              </>
+            );
+          })()}
         </div>
       </aside>
 

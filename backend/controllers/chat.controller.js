@@ -50,8 +50,8 @@ export const getChats = async (req, res) => {
     const chats = await Chat.find({
       user: req.user._id,
     })
-      .select("title createdAt updatedAt lastMessageAt")
-      .sort({ updatedAt: -1 })
+      .select("title createdAt updatedAt lastMessageAt pinned")
+      .sort({ pinned: -1, updatedAt: -1 })
       .limit(100)
       .lean();
 
@@ -254,6 +254,43 @@ export const renameChat = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Unable to rename the chat.",
+    });
+  }
+};
+
+export const pinChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    if (!isValidObjectId(chatId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid chat ID.",
+      });
+    }
+
+    const chat = await Chat.findOne({ _id: chatId, user: req.user._id });
+
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: "Chat not found.",
+      });
+    }
+
+    chat.pinned = !chat.pinned;
+    await chat.save();
+
+    return res.status(200).json({
+      success: true,
+      pinned: chat.pinned,
+      message: chat.pinned ? "Chat pinned." : "Chat unpinned.",
+    });
+  } catch (error) {
+    console.error("Pin chat error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update pin status.",
     });
   }
 };
