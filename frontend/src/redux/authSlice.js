@@ -10,6 +10,7 @@ const loadAuthState = () => {
     if (!storedAuth) {
       return {
         user: null,
+        token: null,
         isAuthenticated: false,
       };
     }
@@ -18,6 +19,7 @@ const loadAuthState = () => {
 
     return {
       user: parsedAuth.user || null,
+      token: parsedAuth.token || null,
       isAuthenticated: Boolean(parsedAuth.user),
     };
   } catch (error) {
@@ -25,6 +27,7 @@ const loadAuthState = () => {
 
     return {
       user: null,
+      token: null,
       isAuthenticated: false,
     };
   }
@@ -35,16 +38,22 @@ const authSlice = createSlice({
   initialState: loadAuthState(),
 
   reducers: {
-    // Call after successful authentication.
+    // Call after successful authentication. Supports both loginSuccess(user) and loginSuccess({ user, token }).
     loginSuccess: (state, action) => {
-      state.user = action.payload;
-      state.isAuthenticated = true;
+      const payload = action.payload || {};
+      const user = payload.user !== undefined ? payload.user : payload;
+      const token = payload.token || state.token || null;
+
+      state.user = user;
+      state.token = token;
+      state.isAuthenticated = Boolean(user);
 
       try {
         localStorage.setItem(
           STORAGE_KEY,
           JSON.stringify({
-            user: action.payload,
+            user,
+            token,
           }),
         );
       } catch (error) {
@@ -55,6 +64,7 @@ const authSlice = createSlice({
     // Clear authentication data on logout.
     logoutSuccess: (state) => {
       state.user = null;
+      state.token = null;
       state.isAuthenticated = false;
 
       try {
@@ -76,6 +86,7 @@ const authSlice = createSlice({
           STORAGE_KEY,
           JSON.stringify({
             user: state.user,
+            token: state.token,
           }),
         );
       } catch (error) {

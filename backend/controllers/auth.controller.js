@@ -110,15 +110,54 @@ export const sendOTP = async (req, res) => {
       user?.otpLastSentAt &&
       now.getTime() - user.otpLastSentAt.getTime() < OTP_RESEND_SECONDS * 1000
     ) {
+      const remainingCooldown = Math.ceil(
+        (OTP_RESEND_SECONDS * 1000 - (now.getTime() - user.otpLastSentAt.getTime())) / 1000,
+      );
       console.warn(`[Auth] OTP resend cooldown active for ${maskedEmail}`);
       return res.status(429).json({
         success: false,
-        message: `Please wait ${OTP_RESEND_SECONDS} seconds before requesting another OTP.`,
+        message: `Please wait ${remainingCooldown} seconds before requesting another OTP.`,
+        retryAfter: remainingCooldown,
+      });
+    }
+
+    const { name, username } = req.body || {};
+    if (name && (typeof name !== "string" || name.length > 100)) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must be 100 characters or fewer.",
+      });
+    }
+    if (
+      username &&
+      (typeof username !== "string" ||
+        username.length > 30 ||
+        !/^[a-zA-Z0-9_.-]*$/.test(username.trim()))
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Username must be 30 characters or fewer and contain only letters, numbers, underscores, dashes, or dots.",
       });
     }
 
     if (!user) {
-      user = new User({ email });
+      const emailPrefix = email.split("@")[0] || "";
+      user = new User({
+        email,
+        name: typeof name === "string" && name.trim() ? name.trim() : emailPrefix,
+        username:
+          typeof username === "string" && username.trim()
+            ? username.trim().toLowerCase()
+            : emailPrefix.toLowerCase().replace(/[^a-z0-9_.-]/g, "").slice(0, 30),
+      });
+    } else {
+      if (typeof name === "string" && name.trim() && !user.name) {
+        user.name = name.trim();
+      }
+      if (typeof username === "string" && username.trim() && !user.username) {
+        user.username = username.trim().toLowerCase();
+      }
     }
 
     const otp = crypto.randomInt(100000, 1000000).toString();
@@ -357,9 +396,13 @@ export const verifyOTP = async (req, res) => {
 
       await user.save();
 
+      const remainingAttempts = Math.max(0, OTP_MAX_ATTEMPTS - (user.otpAttempts || 0));
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired verification code.",
+        message: user.otpBlockedUntil
+          ? "Too many incorrect attempts. Your account has been temporarily blocked for 15 minutes."
+          : `Invalid verification code. ${remainingAttempts} attempt(s) remaining.`,
+        remainingAttempts,
       });
     }
 
@@ -380,6 +423,7 @@ export const verifyOTP = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Authentication successful.",
+      token,
       user: {
         id: user._id,
         email: user.email,

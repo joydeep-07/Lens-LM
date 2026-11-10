@@ -121,7 +121,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "X-CSRF-Token"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
   }),
 );
 
@@ -317,8 +317,17 @@ const startServer = async () => {
 
     console.log("MongoDB connected successfully.");
 
-    const server = app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    mongoose.connection.on("error", (err) => {
+      console.error("[MongoDB] Connection error:", err.message);
+    });
+
+    mongoose.connection.on("disconnected", () => {
+      console.warn("[MongoDB] Disconnected. Reconnecting...");
+    });
+
+    const HOST = "0.0.0.0";
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`Server running on http://${HOST}:${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
       console.log(`Allowed CORS origins:`, Array.from(allowedOrigins).join(", "));
     });

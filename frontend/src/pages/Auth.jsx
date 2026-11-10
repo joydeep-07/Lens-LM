@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
@@ -31,6 +31,15 @@ const Auth = ({ className = "" }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   // Send OTP to the user's email.
   const handleSendOTP = async (e) => {
@@ -69,6 +78,7 @@ const Auth = ({ className = "" }) => {
       );
 
       setStep(2);
+      setResendCooldown(response.data?.resendAfter || 60);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -76,6 +86,9 @@ const Auth = ({ className = "" }) => {
           err.message ||
           "Unable to send OTP. Please try again.",
       );
+      if (err.response?.data?.retryAfter) {
+        setResendCooldown(err.response.data.retryAfter);
+      }
     } finally {
       setLoading(false);
     }
@@ -105,6 +118,7 @@ const Auth = ({ className = "" }) => {
 
       // Expect the backend to return the authenticated user.
       const user = response.data?.user;
+      const token = response.data?.token;
 
       if (!user) {
         throw new Error(
@@ -113,7 +127,7 @@ const Auth = ({ className = "" }) => {
       }
 
       // Redux updates its state and persists the profile to localStorage.
-      dispatch(loginSuccess(user));
+      dispatch(loginSuccess({ user, token }));
 
       setMessage(response.data?.message || "Login successful.");
 
@@ -442,10 +456,14 @@ const Auth = ({ className = "" }) => {
                       <button
                         type="button"
                         onClick={() => handleSendOTP()}
-                        disabled={loading}
+                        disabled={loading || resendCooldown > 0}
                         className="w-full text-center text-[10px] uppercase tracking-[0.15em] text-[var(--text-secondary)] hover:text-[var(--google-blue)] transition-colors disabled:opacity-50"
                       >
-                        {loading ? "Please wait..." : "Resend OTP"}
+                        {loading
+                          ? "Please wait..."
+                          : resendCooldown > 0
+                            ? `Resend OTP in ${resendCooldown}s`
+                            : "Resend OTP"}
                       </button>
                     </motion.form>
                   )}
