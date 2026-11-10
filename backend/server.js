@@ -37,14 +37,11 @@ for (const variable of requiredEnvironmentVariables) {
   }
 }
 
-const hasEmailConfig =
-  Boolean(process.env.RESEND_API_KEY) ||
-  Boolean(process.env.BREVO_API_KEY) ||
-  Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+const hasEmailConfig = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
 if (!hasEmailConfig) {
   console.warn(
-    "[Email] Warning: No email provider configured. Please provide RESEND_API_KEY (recommended on Render Free Tier), BREVO_API_KEY, or EMAIL_USER and EMAIL_PASS.",
+    "[Email] Warning: Nodemailer credentials missing. Please set EMAIL_USER and EMAIL_PASS in environment variables.",
   );
 }
 
@@ -199,33 +196,15 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/auth/email-status", (req, res) => {
-  const resendConfigured = Boolean(process.env.RESEND_API_KEY);
-  const brevoConfigured = Boolean(process.env.BREVO_API_KEY);
-  const smtpConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
-
-  const configuredProviders = [];
-  if (resendConfigured) configuredProviders.push("resend");
-  if (brevoConfigured) configuredProviders.push("brevo");
-  if (smtpConfigured) configuredProviders.push("smtp");
-
-  const emailFrom = (process.env.EMAIL_FROM || "Lens LM <onboarding@resend.dev>").trim();
-  const isResendTestingDomain = resendConfigured && /onboarding@resend\.dev/i.test(emailFrom);
-
-  let statusNotice = "Email delivery is configured with fallback support.";
-  if (isResendTestingDomain && !brevoConfigured) {
-    statusNotice =
-      "Notice: Resend is using the default test domain (onboarding@resend.dev) which restricts deliveries to the account owner (joydeeprnp8821@gmail.com). To enable OTP delivery to all recipients (Gmail, Outlook, Yahoo) on Render Free Tier, please add BREVO_API_KEY or verify a custom domain in Resend.";
-  }
+  const configured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+  const emailUser = (process.env.EMAIL_USER || "").trim();
 
   res.status(200).json({
     success: true,
-    configuredProviders,
-    resendConfigured,
-    brevoConfigured,
-    smtpConfigured,
-    isResendTestingDomain,
-    emailFrom,
-    notice: statusNotice,
+    provider: "nodemailer",
+    service: "Gmail SMTP",
+    configured,
+    sender: emailUser ? emailUser.replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "*".repeat(b.length) + c) : "none",
   });
 });
 
