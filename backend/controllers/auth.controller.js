@@ -277,21 +277,11 @@ export const sendOTP = async (req, res) => {
         error.message,
       );
 
-      const isSmtpTimeout =
-        error.code === "ETIMEDOUT" ||
-        error.code === "ECONNECTION" ||
-        error.message?.toLowerCase().includes("timeout") ||
-        error.message?.toLowerCase().includes("connect");
-
-      let userFacingMessage =
-        "Unable to send the verification email. Please try again in a moment.";
-
-      if (isSmtpTimeout && isProduction) {
-        userFacingMessage =
-          "Email delivery timed out. Render Free Tier blocks outbound SMTP ports (25, 465, 587). Please configure RESEND_API_KEY in your Render dashboard to send via HTTPS.";
-      } else if (error.message && !isProduction) {
-        userFacingMessage = `Email delivery failed: ${error.message}`;
-      }
+      const userFacingMessage =
+        error.userFacingMessage ||
+        (error.message
+          ? `Email delivery failed: ${error.message}`
+          : "Unable to send the verification email. Please try again in a moment.");
 
       return res.status(503).json({
         success: false,
